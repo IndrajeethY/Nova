@@ -1,0 +1,786 @@
+language:
+  name: "English"
+  code: "en"
+
+system:
+  started: "🚀 NovaUserbot started in %s"
+
+common:
+  no_reason: "No reason"
+
+alive:
+  message: |
+    🚀 <b>Nᴏᴠᴀ Is Aʟɪᴠᴇ!</b>
+
+    <b>Oᴡɴᴇʀ:</b> <code>%s</code> (<code>%d</code>)
+    <b>Sᴜᴅᴏs Cᴏᴜɴᴛ:</b> <code>%d</code>
+    <b>Gᴏ Vᴇʀsɪᴏɴ:</b> <code>%s</code>
+    <b>Gᴏɢʀᴀᴍ Vᴇʀsɪᴏɴ:</b> <code>%s</code>
+    <b>Uᴘᴛɪᴍᴇ:</b> <code>%s</code>
+
+ping:
+  pinging: "<code>Pinging...</code>"
+  dc_pinging: "<code>Pinging all DCs...</code>"
+  result: |
+    <b>Pong!</b>
+    <b>Time taken:</b> <code>%d</code>ms
+    <b>Uptime:</b> <code>%s</code>
+  dc_header: "<b>Data Center Pings:</b>"
+  dc_entry: "<b>%s:</b> <code>%s</code> ms"
+  dc_failed: "<b>%s:</b> <code>Failed to ping</code>"
+
+database:
+  set_success: |
+    <b>Variable set successfully:</b>
+    <b>Key:</b> <code>%s</code>
+    <b>Value:</b> <code>%s</code>
+  set_error: "<code>Error setting variable: %s</code>"
+  get_result: |
+    <b>Key:</b> <code>%s</code>
+    <b>Value:</b> <code>%s</code>
+  get_not_found: "<code>Variable not found</code>"
+  del_success: "<b>Variable deleted successfully:</b> <code>%s</code>"
+  del_not_found: "<code>Variable not found</code>"
+  del_error: "<code>Error deleting variable: %s</code>"
+  list_header: "<b>Total variables:</b> <code>%d</code>"
+  list_entry: "<b>▸</b> <code>%s</code>"
+  list_empty: "<b>No variables found in database</b>"
+  fetch_error: "<code>Error fetching variables</code>"
+  del_all_warning: |
+    <b>⚠️ Warning:</b> This will delete ALL variables from the database!
+
+    To confirm, use: <code>.delallvars confirm</code>
+  del_all_success: "<b>All variables deleted successfully</b>"
+  del_all_error: "<code>Error deleting variables</code>"
+  usage_setvar: "<code>Usage: .setvar &lt;key&gt; &lt;value&gt;</code>"
+  usage_getvar: "<code>Usage: .getvar &lt;key&gt;</code>"
+  usage_delvar: "<code>Usage: .delvar &lt;key&gt;</code>"
+  key_value_required: "<code>Both key and value are required</code>"
+
+admin:
+  banning: "<code>Banning user...</code>"
+  banned: |
+    <b>Banned <a href='tg://user?id=%d'>%s</a></b>
+    <b>Reason:</b> %s
+  ban_error: "<code>Error banning user</code>"
+  unbanning: "<code>Unbanning user...</code>"
+  unbanned: "<b>Unbanned <a href='tg://user?id=%d'>%s</a></b>"
+  unban_error: "<code>User is not banned</code>"
+  kicking: "<code>Kicking user...</code>"
+  kicked: |
+    <b>Kicked <a href='tg://user?id=%d'>%s</a></b>
+    <b>Reason:</b> %s
+  kick_error: "<code>Error kicking user</code>"
+  muting: "<code>Muting user...</code>"
+  muted: "<b>Muted <a href='tg://user?id=%d'>%s</a></b>"
+  mute_error: "<code>Error muting user</code>"
+  unmuting: "<code>Unmuting user...</code>"
+  unmuted: "<b>Unmuted <a href='tg://user?id=%d'>%s</a></b>"
+  unmute_error: "<code>User is not muted</code>"
+  dmuting: "<code>Demoting and muting user...</code>"
+  dmute_error: "<code>Error demoting and muting user</code>"
+  promoting: "<code>Promoting user...</code>"
+  promoted: "<b>Promoted <a href='tg://user?id=%d'>%s</a></b>"
+  promote_error: "<code>Error promoting user</code>"
+  demoting: "<code>Demoting user...</code>"
+  demoted: "<b>Demoted <a href='tg://user?id=%d'>%s</a></b>"
+  demote_error: "<code>Error demoting user</code>"
+  pinned: "<b>Pinned <a href='%s'>this</a> message</b>"
+  pin_error: "<code>Error pinning message</code>"
+  unpinned: "<b>Unpinned <a href='%s'>this</a> message</b>"
+  unpin_error: "<code>Error unpinning message</code>"
+  groups_only: "This command can only be used in groups."
+  usage_ban: "<code>Usage: .ban &lt;user_id&gt; or reply to a user</code>"
+  usage_unban: "<code>Usage: .unban &lt;user_id&gt; or reply to a user</code>"
+  usage_kick: "<code>Usage: .kick &lt;user_id&gt; or reply to a user</code>"
+  usage_mute: "<code>Usage: .mute &lt;user_id&gt; or reply to a user</code>"
+  usage_unmute: "<code>Usage: .unmute &lt;user_id&gt; or reply to a user</code>"
+  usage_dmute: "<code>Usage: .dmute &lt;user_id&gt; or reply to a user</code>"
+  usage_promote: "<code>Usage: .promote &lt;user_id&gt; or reply to a user</code>"
+  usage_demote: "<code>Usage: .demote &lt;user_id&gt; or reply to a user</code>"
+  usage_pin: "<code>Usage: .pin (reply to a message)</code>"
+  usage_unpin: "<code>Usage: .unpin (reply to a message)</code>"
+  zombies_searching: "<code>Searching for zombies...</code>"
+  zombies_not_found: "No Deleted accounts found."
+  zombies_found: "Found %d zombies. Use <code>.zombies clean</code> to remove them."
+  zombies_cleaned: "Cleaned %d zombies, %d failed."
+  no_permissions: "You don't have enough permissions to use this command."
+  get_permissions_error: "Failed to get your permissions."
+
+sudo:
+  adding: "<code>Adding sudo...</code>"
+  added: "<b>Sudo added <a href='tg://user?id=%d'>%s</a> as sudo</b>"
+  already_sudo: "<code>User is already a sudo</code>"
+  add_error: "<code>Error adding sudo</code>"
+  deleting: "<code>Deleting sudo...</code>"
+  deleted: "<b>Sudo deleted <a href='tg://user?id=%d'>%s</a> as sudo</b>"
+  not_sudo: "<code>User is not a sudo</code>"
+  del_error: "<code>Error deleting sudo</code>"
+  fetching: "<code>Fetching sudos...</code>"
+  list_header: "<b>Total sudos:</b> <code>%d</code>"
+  list_entry: "<b>▸</b> <a href='tg://user?id=%d'>%s</a>"
+  fetch_error: "<code>Error fetching sudos</code>"
+  usage_add: "<code>Usage: .addsudo &lt;user_id&gt; or reply to a user</code>"
+  usage_del: "<code>Usage: .delsudo &lt;user_id&gt; or reply to a user</code>"
+
+gban:
+  banning: "<code>Globally banning user...</code>"
+  banned: |
+    <b>Globally banned <a href='tg://user?id=%d'>%s</a></b>
+    <b>Reason:</b> %s
+    <b>Success:</b> %d
+  already_banned: |
+    <b>User <a href='tg://user?id=%d'>%s</a> is already globally banned</b>
+    <b>Reason:</b> %s
+    <b>Time:</b> %s
+  ban_error: "<code>Error globally banning user</code>"
+  unbanning: "<code>Unglobally banning user...</code>"
+  unbanned: |
+    <b>Unglobally banned <a href='tg://user?id=%d'>%s</a></b>
+    <b>Success:</b> %d
+  not_banned: "<b>User <a href='tg://user?id=%d'>%s</a> is not globally banned</b>"
+  unban_error: "<code>Error removing global ban</code>"
+  cant_ban_self: "<code>Can't globally ban myself</code>"
+  fetching: "<code>Fetching globally banned users...</code>"
+  list_header: "<b>Globally banned users:</b>"
+  list_entry: "<b>▸</b> <code>%d</code> <b>Reason:</b> %s"
+  list_empty: "<b>No users are globally banned</b>"
+  log_banned: |
+    <b>#Globally Banned</b>
+    <b>User:</b> <a href='tg://user?id=%d'>%s</a>
+    <b>Reason:</b> %s
+  log_unbanned: |
+    <b>#Globally Unbanned</b>
+    <b>User:</b> <a href='tg://user?id=%d'>%s</a>
+  antispam_enabled: "Antispam has been enabled."
+  antispam_disabled: "Antispam has been disabled."
+  antispam_on: "<b>Antispam is enabled</b>"
+  antispam_off: "<b>Antispam is disabled</b>"
+  antispam_usage: "Usage: .antispam <enable|disable>"
+  usage_gban: "<code>Usage: .gban &lt;user_id&gt; or reply to a user</code>"
+  usage_ungban: "<code>Usage: .ungban &lt;user_id&gt; or reply to a user</code>"
+
+pm_permit:
+  approved: "User <a href='tg://user?id=%d'>%s</a> approved to pm."
+  already_approved: "User <a href='tg://user?id=%d'>%s</a> is already approved to pm."
+  disapproved: "User <a href='tg://user?id=%d'>%s</a> disapproved."
+  not_approved: "User <a href='tg://user?id=%d'>%s</a> is not approved."
+  invalid_user: "Invalid user ID."
+  approve_error: "Error approving user."
+  disapprove_error: "Error disapproving user."
+  fetching: "<code>Fetching approved users...</code>"
+  list_header: "<b>Approved users:</b>"
+  fetch_error: "Error fetching approved users."
+  prompt_set: "Prompt set successfully."
+  prompt_error: "Error setting prompt."
+  usage_prompt: "Usage: .setprompt <prompt>"
+  message_limit: "You've reached your message limit. You will be temporarily blocked from messaging %s."
+
+tag_logger:
+  set_success: |
+    <b>Tag logger set successfully:</b>
+    <b>Chat ID:</b> <code>%s</code>
+  get_result: "<b>Tag logger:</b> <code>%s</code>"
+  not_set: "<code>Tag logger not set</code>"
+  deleted: "<b>Tag logger deleted successfully</b>"
+  not_found: "<code>Tag logger not found</code>"
+  set_error: "<code>Error setting tag logger</code>"
+  send_error: "<code>Error sending message to the chat</code>"
+  invalid_chat: "<code>Invalid chat id</code>"
+  assistant_not_in_chat: "<code>Assistant is not in the chat</code>"
+  usage: "<code>Usage: .taglogger &lt;chat_id&gt;</code>"
+  notification: |
+    <b>Yᴏᴜ Hᴀᴠᴇ Bᴇᴇɴ Tᴀɢɢᴇᴅ:</b>
+
+    <b>Cʜᴀᴛ Tɪᴛʟᴇ:</b> <code>%s</code>
+    <b>Tᴀɢɢᴇᴅ Bʏ:</b> <code>%s</code>
+    <b>Mᴇꜱꜱᴀɢᴇ:</b> <code>%s</code>
+  no_text: "No Text or Might be a media"
+  go_to_message: "🔗 Go to message"
+
+userinfo:
+  fetching_stats: "<code>Fetching Stats...This may take a while</code>"
+  fetching_info: "<code>Fetching user info...</code>"
+  info_header: "<b>Fᴇᴛᴄʜᴇᴅ Iɴғᴏ:</b>\n"
+  first_name: "<b>Fɪʀsᴛ Nᴀᴍᴇ:</b> %s\n"
+  last_name: "<b>Lᴀsᴛ Nᴀᴍᴇ:</b> %s\n"
+  user_id: "<b>Usᴇʀ Iᴅ:</b> <code>%d</code>\n"
+  username: "<b>Usᴇʀɴᴀᴍᴇ:</b> @%s\n"
+  about: "<b>Aʙᴏᴜᴛ:</b> <code>%s</code>\n"
+  usernames: "<b>Usᴇʀɴᴀᴍᴇs:</b> [<code>%s</code>]\n"
+  birthday: "\n<b>Bɪʀᴛʜᴅᴀʏ:</b> %s\n"
+  user_link: "<b>Usᴇʀ Lɪɴᴋ:</b> <a href='tg://user?id=%d'>Lɪɴᴋ</a>\n"
+  dc_id: "<b>Dᴄ Iᴅ:</b> <code>%d</code>\n"
+  is_bot: "<b>Is Bᴏᴛ:</b> <code>%t</code>\n"
+  is_deleted: "<b>Is Dᴇʟᴇᴛᴇᴅ:</b> <code>%t</code>\n"
+  is_contact: "<b>Is Cᴏɴᴛᴀᴄᴛ:</b> <code>%t</code>\n"
+  is_mutual: "<b>Is Mᴜᴛᴜᴀʟ Cᴏɴᴛᴀᴄᴛ:</b> <code>%t</code>\n"
+  is_premium: "<b>Is Pʀᴇᴍɪᴜᴍ:</b> <code>%t</code>\n"
+  chat_title: "<b>Cʜᴀᴛ Tɪᴛʟᴇ:</b> %s\n"
+  chat_id: "<b>Cʜᴀᴛ Iᴅ:</b> <code>%d</code>\n"
+  chat_username: "<b>Cʜᴀᴛ Usᴇʀɴᴀᴍᴇ:</b> @%s\n"
+  participants: "<b>Pᴀʀᴛɪᴄɪᴘᴀɴᴛs Cᴏᴜɴᴛ:</b> %d\n"
+  admins_count: "<b>Aᴅᴍɪɴs Cᴏᴜɴᴛ:</b> %d\n"
+  unknown_peer: "<code>Unknown Peer Type</code>"
+  usage_info: "<code>Usage: .info &lt;user_id&gt; or reply to a user</code>"
+  id_user: "<b><a href='tg://user?id=%d'>User ID</a></b>: <code>%d</code>\n"
+  id_chat: "<b><a href='%s'>Chat ID</a></b>: <code>%d</code>\n"
+  id_message: "<b><a href='%s'>Message ID</a></b>: <code>%d</code>\n"
+  id_reply: "<b><a href='%s'>Replied Message ID</a></b>: <code>%d</code>\n"
+  id_file: "<b><a href='%s'>Replied File ID</a></b>: <code>%s</code>\n"
+  stats: |
+    <b> ‹Usᴇʀ Sᴛᴀᴛs›</b>
+
+    <b>👤 Usᴇʀs:</b> %d
+    <b>🤖 Bᴏᴛs:</b> %d
+    <b>👥 Gʀᴏᴜᴘs:</b> %d
+    <b>📡 Cʜᴀɴɴᴇʟs:</b> %d
+    <b>📞 Cᴏɴᴛᴀᴄᴛs:</b> %d
+    <b>🔒 Bʟᴏᴄᴋᴇᴅ:</b> %d
+    <b>📌 Pɪɴɴᴇᴅ:</b> %d
+    <b>📩 Uɴʀᴇᴀᴅ Mᴇssᴀɢᴇs:</b> %d
+    <b>🔔 Nᴏᴛɪғɪᴄᴀᴛɪᴏɴs:</b> %d
+    <b>📢 Mᴇɴᴛɪᴏɴs:</b> %d
+    <b>👍 Rᴇᴀᴄᴛɪᴏɴs:</b> %d
+
+    <b> ‹Cʜᴀᴛ Sᴛᴀᴛs›</b>
+
+    <b>👑 Cʀᴇᴀᴛᴏʀs:</b> %d
+    <b>🛡️ Aᴅᴍɪɴs ɪɴ Gʀᴏᴜᴘs:</b> %d
+    <b>🛡️ Aᴅᴍɪɴs ɪɴ Cʜᴀɴɴᴇʟs:</b> %d
+    <b>🔇 Dᴇʟᴇᴛᴇᴅ Usᴇʀs:</b> %d
+    <b>🤝 Mᴜᴛᴜᴀʟ Cᴏɴᴛᴀᴄᴛs:</b> %d
+
+    <b> ‹Oᴛʜᴇʀ Sᴛᴀᴛs›</b>
+
+    <b>📈 Tᴏᴛᴀʟ Dɪᴀʟᴏɢs:</b> %d
+    <b>🚫 Bʟᴏᴄᴋᴇᴅ Cᴏɴᴛᴀᴄᴛs:</b> %d
+
+help:
+  menu_title: "<b>Aᴠᴀɪʟᴀʙʟᴇ Hᴇʟᴘ Mᴏᴅᴜʟᴇs:</b>"
+  not_allowed_title: "Not Allowed"
+  not_allowed_desc: "You are not allowed to use this bot"
+  owner_btn: "Owner"
+  back_btn: "⬅ Back"
+  next_btn: "Next ➡"
+  commands_header: "Here are the commands for <b>%s</b>:\n\n"
+  command_entry: "<code>.%s</code> - %s\n"
+  fetch_error: "<code>Coudn't fetch help menu</code>"
+  module_not_found: "<code>Module or command not found. Try .help to see all modules.</code>"
+  usage_hint: "<i>Use <code>.help &lt;module/command&gt;</code> to get help for a specific module or command.</i>"
+
+dev:
+  running: "<code>Running...</code>"
+  shell_result: |
+    <b>CMD:</b> <pre lang='shell'>%s</pre>
+    <b>OUTPUT:</b> <pre lang='shell'>%s</pre>
+  shell_no_output: |
+    <b>CMD:</b> <pre lang='bash'>%s</pre>
+    <b>OUTPUT:</b> <pre lang='bash'>No Output</pre>
+  eval_result: |
+    <b>Eval Code:</b> <pre lang='go'>%s</pre>
+    <b>Output:</b> <pre lang='go'>%s</pre>
+  no_command: "No command provided"
+  no_code: "<code>No code provided</code>"
+  error: "<b>ERROR:</b> <pre lang='go'>%s</pre>"
+
+misc:
+  downloading: "Downloading media..."
+  uploading: "Uploading media..."
+  upload_success: "Successfully uploaded media.\nLink: %s"
+  reply_to_media: "Reply to a media message to generate a link."
+  no_media: "The replied message does not contain any media."
+  error_fetching_reply: "An error occurred while fetching the reply message."
+  error_downloading: "An error occurred while downloading the media."
+
+chatbot:
+  fetching: "<code>Fetching Response...</code>"
+  result: "**Query:** `%s`\n\n**Response:**\n%s"
+  no_query: "<code>No Query Provided</code>"
+  error: "<code>Error Fetching Data</code>"
+
+lang_settings:
+  changed: "<b>Language set to:</b> %s (<code>%s</code>)"
+  current: "<b>Current Language:</b> %s (<code>%s</code>)"
+  not_found: "<code>Language '%s' not available. Use .setlang to see available languages.</code>"
+  set_error: "<code>Error setting language</code>"
+  available_header: "<b>Available Languages:</b>\n\n"
+  available_entry: "▸ <code>%s</code> - %s\n"
+  usage: "\n<b>Usage:</b> <code>.setlang &lt;code&gt;</code>"
+
+logging:
+  log_set_success: |
+    <b>Log channel set successfully:</b>
+    <b>Chat ID:</b> <code>%s</code>
+  log_result: "<b>Log Channel:</b> <code>%s</code>"
+  not_set: "<code>Log channel not configured</code>"
+  deleted: "<b>Log channel removed successfully</b>"
+  not_found: "<code>Log channel not configured</code>"
+  enabled: "<b>Channel logging enabled</b>"
+  disabled: "<b>Channel logging disabled</b>"
+  invalid_chat: "<code>Invalid chat ID</code>"
+  assistant_not_in_chat: "<code>Assistant bot is not in this chat</code>"
+  send_error: "<code>Error sending message to the chat</code>"
+  usage_setlog: "<code>Usage: .setlog &lt;chat_id&gt;</code>"
+  usage_toggle: "<code>Usage: .logging &lt;on|off&gt;</code>"
+
+updater:
+  checking: "<code>Checking for updates...</code>"
+  check_error: "<code>Error checking for updates: %s</code>"
+  up_to_date: "<b>✅ Bot is up to date!</b>"
+  updates_available: "<b>📦 Updates available!</b>\n\nUse <code>.update</code> to update."
+  updating: "<code>Updating...</code>"
+  update_error: "<code>Error updating: %s</code>"
+  update_success: "<b>✅ Updated successfully!</b>\n\nRestart the bot to apply changes."
+
+banguard:
+  groups_only: "<code>This command can only be used in groups.</code>"
+  usage_gconfig: |
+    <b>Usage:</b> <code>.gconfig &lt;duration&gt; &lt;limit&gt;</code>
+    
+    <b>Example:</b> <code>.gconfig 10s 5</code>
+    (Demote admins who ban 5 users within 10 seconds)
+  usage_gtoggle: "<code>Usage: .gtoggle &lt;on|off&gt;</code>"
+  invalid_duration: "<code>Invalid duration format. Use formats like: 10s, 1m, 1h</code>"
+  invalid_limit: "<code>Invalid limit. Please provide a positive number.</code>"
+  config_error: "<code>Error saving configuration.</code>"
+  limits_set: |
+    <b>✅ BanGuard configured!</b>
+    
+    <b>Duration:</b> <code>%s</code>
+    <b>Limit:</b> <code>%d</code> bans
+  enabled_default: |
+    <b>✅ BanGuard enabled with default settings!</b>
+    
+    <b>Duration:</b> <code>10s</code>
+    <b>Limit:</b> <code>5</code> bans
+  enabled: "<b>✅ BanGuard enabled!</b>"
+  disabled: "<b>❌ BanGuard disabled!</b>"
+  not_configured: "<code>BanGuard is not configured. Use .gconfig first.</code>"
+  status_disabled: "<b>BanGuard Status:</b> <code>Disabled</code>"
+  status_enabled: |
+    <b>BanGuard Status:</b> <code>Enabled</code>
+    
+    <b>Limit:</b> <code>%d</code> bans
+    <b>Duration:</b> <code>%s</code>
+  user_demoted: "<b>⚠️ Admin <a href='tg://user?id=%d'>%s</a> has been demoted for exceeding the ban limit!</b>"
+  demote_failed: "<code>Failed to demote admin %d for exceeding ban limit.</code>"
+  log_demoted: |
+    <b>🛡️ BanGuard Action</b>
+    
+    <b>Chat:</b> <code>%s</code> (<code>%d</code>)
+    <b>Admin:</b> <a href='tg://user?id=%d'>%s</a>
+    <b>User ID:</b> <code>%d</code>
+    <b>Bans in window:</b> <code>%d</code>
+    <b>Action:</b> Demoted
+
+reminders:
+  usage: |
+    <b>Usage:</b> <code>.remind &lt;duration&gt; &lt;text&gt;</code>
+    
+    <b>Duration formats:</b> 1m, 1h, 1d, 1h30m
+    <b>Example:</b> <code>.remind 2h Check emails</code>
+  usage_delreminder: "<code>Usage: .delreminder &lt;number&gt;</code>"
+  invalid_duration: "<code>Invalid duration format. Use formats like: 1m, 1h, 1d, 1h30m</code>"
+  invalid_index: "<code>Invalid reminder number.</code>"
+  too_long: "<code>Maximum reminder duration is 30 days.</code>"
+  too_short: "<code>Minimum reminder duration is 1 minute.</code>"
+  limit_reached: "<code>You have reached the maximum number of reminders (25).</code>"
+  text_too_long: "<code>Reminder text is too long. Maximum 500 characters.</code>"
+  created: |
+    <b>⏰ Reminder set!</b>
+    
+    <b>Time:</b> <code>%s</code>
+    <b>Text:</b> %s
+  list_header: "<b>📋 Your Reminders:</b>"
+  none: "<code>You don't have any reminders.</code>"
+  not_found: "<code>Reminder not found.</code>"
+  deleted: "<b>✅ Reminder deleted!</b>"
+  cleared: "<b>✅ All your reminders have been cleared!</b>"
+  error: "<code>An error occurred while processing your request.</code>"
+  notification: |
+    <b>⏰ Reminder!</b>
+    
+    %s
+  notification_with_link: |
+    <b>⏰ Reminder!</b>
+    
+    %s
+    
+    <a href='%s'>Go to message</a>
+
+speedtest:
+  running: "<code>🚀 Running speedtest...</code>"
+  failed: "<code>❌ Speedtest failed. Make sure speedtest-cli is installed.</code>"
+  result: |
+    <b>📊 Speedtest Results:</b>
+    
+    <b>Download:</b> <code>%.2f Mb/s</code>
+    <b>Upload:</b> <code>%.2f Mb/s</code>
+    <b>Ping:</b> <code>%d ms</code>
+
+search:
+  fetching: "<code>Fetching...</code>"
+  searching: "<code>Searching...</code>"
+  searching_images: "<code>Searching for images...</code>"
+  github_usage: "<code>Usage: .github &lt;username&gt;</code>"
+  github_not_found: "<code>GitHub user not found</code>"
+  github_error: "<code>Error fetching GitHub user info</code>"
+  github_result: |
+    <b><a href='%s'>GITHUB</a></b>
+    
+    <b>Name:</b> %s
+    <b>Username:</b> %s
+    <b>ID:</b> <code>%d</code>
+    <b>Company:</b> %s
+    <b>Blog:</b> %s
+    <b>Location:</b> %s
+    <b>Bio:</b> %s
+    <b>Repos:</b> %d
+    <b>Followers:</b> %d
+    <b>Following:</b> %d
+  google_usage: "<code>Usage: .google &lt;query&gt;</code>"
+  google_result: |
+    <b>Search Query:</b>
+    <code>%s</code>
+    
+    <b>Results:</b>
+    %s
+  no_results: "<code>No results found for '%s'</code>"
+  img_usage: |
+    <code>Usage: .img &lt;query&gt;</code>
+    <code>Usage: .img &lt;query&gt; ; &lt;count&gt;</code>
+  no_images: "<code>No images found for '%s'</code>"
+  image_caption: "🖼 <code>%s</code>"
+  ipinfo_usage: "<code>Usage: .ipinfo &lt;ip_address&gt;</code>"
+  ipinfo_not_found: "<code>IP address not found or invalid</code>"
+  ipinfo_error: "<code>Error fetching IP info</code>"
+  ipinfo_result: |
+    <b>🌐 IP Information</b>
+    
+    <b>IP:</b> <code>%s</code>
+    <b>Hostname:</b> <code>%s</code>
+    <b>City:</b> %s
+    <b>Region:</b> %s
+    <b>Country:</b> %s
+    <b>Location:</b> <code>%s</code>
+    <b>Organization:</b> %s
+    <b>Postal:</b> %s
+    <b>Timezone:</b> %s
+
+unsplash:
+  usage: |
+    <code>Usage: .unsplash &lt;query&gt;</code>
+    <code>Usage: .unsplash &lt;query&gt; ; &lt;count&gt;</code>
+  searching: "<code>Searching Unsplash...</code>"
+  no_results: "<code>No images found for '%s'</code>"
+  download_error: "<code>Failed to download images for '%s'</code>"
+  caption: "📷 Unsplash: <code>%s</code>"
+  uploaded: "<b>✅ Uploaded %d images!</b>"
+
+stories:
+  reply_required: "<code>Please reply to a photo or video!</code>"
+  error_fetching_reply: "<code>Error fetching reply message</code>"
+  no_media: "<code>Please reply to a photo or video!</code>"
+  uploading: "<code>Uploading story...</code>"
+  upload_error: "<code>Error: %s</code>"
+  story_live: "<b>🔥 Story is Live!</b>"
+  story_live_with_privacy: "<b>🔥 Story is Live!</b>\n<b>Privacy:</b> <code>%s</code>"
+  privacy_usage: |
+    <code>Usage: .setstory [all|contacts]</code>
+    
+    <b>all</b> - Visible to everyone (default)
+    <b>contacts</b> - Visible to contacts only
+  usage: "<code>Please reply to a user, provide username or story link!</code>"
+  fetching: "<code>Fetching stories...</code>"
+  user_not_found: "<code>User '%s' not found</code>"
+  invalid_peer: "<code>Invalid peer type</code>"
+  fetch_error: "<code>Error fetching stories: %s</code>"
+  story_not_found: "<code>Story not found or expired!</code>"
+  no_stories: "<code>No stories found!</code>"
+  download_failed: "<code>Failed to download stories</code>"
+  uploaded: "<b>✅ Uploaded Story!</b>"
+  uploaded_count: "<b>✅ Uploaded %d Stories!</b>"
+  invalid_index: "<code>Invalid index. You have %d archived stories (use -n 1 to -n %d)</code>"
+  archived_downloaded: "<b>✅ Downloaded archived story #%d</b>"
+
+afk:
+  now_afk: |
+    <b>🌙 You are now AFK</b>
+    <b>Reason:</b> %s
+  back: |
+    <b>👋 Welcome back!</b>
+    <b>You were AFK for:</b> <code>%s</code>
+    <b>Messages received:</b> <code>%d</code>
+  auto_back: |
+    <b>👋 You're no longer AFK</b>
+    <b>You were AFK for:</b> <code>%s</code>
+    <b>Messages received:</b> <code>%d</code>
+  reply: |
+    <b>🌙 I'm currently AFK</b>
+    <b>Since:</b> <code>%s</code>
+    <b>Reason:</b> %s
+  not_afk: "<code>You are not AFK</code>"
+  set_error: "<code>Error setting AFK status</code>"
+
+gdrive:
+  setup_usage: |
+    <b>Usage:</b> <code>.gsetup &lt;client_id&gt; &lt;client_secret&gt;</code>
+
+    <b>To get credentials:</b>
+    1. Go to <a href='https://console.cloud.google.com/'>Google Cloud Console</a>
+    2. Create a new project or select existing
+    3. Enable Google Drive API
+    4. Go to Credentials → Create OAuth 2.0 Client ID
+    5. Select Desktop application
+    6. Copy Client ID and Client Secret
+  auth_url: |
+    <b>🔗 Authorization Required</b>
+
+    1. Open this link: %s
+    2. Authorize the application
+    3. Copy the authorization code
+    4. Use <code>.gauth &lt;code&gt;</code> to complete setup
+  auth_usage: "<code>Usage: .gauth &lt;authorization_code&gt;</code>"
+  auth_success: "<b>✅ Google Drive connected successfully!</b>"
+  auth_error: "<code>Authorization failed: %s</code>"
+  not_configured: "<code>Google Drive not configured. Use .gsetup first.</code>"
+  setup_error: "<code>Error saving configuration</code>"
+  reply_to_file: "<code>Reply to a file to upload</code>"
+  fetch_error: "<code>Error fetching reply message</code>"
+  no_media: "<code>No media found in the replied message</code>"
+  downloading: "<code>📥 Downloading file...</code>"
+  download_error: "<code>Error downloading file</code>"
+  uploading: "<code>📤 Uploading to Google Drive...</code>"
+  uploading_telegram: "<code>📤 Uploading to Telegram...</code>"
+  upload_success: |
+    <b>✅ Uploaded to Google Drive!</b>
+
+    <b>File:</b> <code>%s</code>
+    <b>Link:</b> %s
+  upload_error: "<code>Upload failed: %s</code>"
+  token_error: "<code>Token error: %s</code>"
+  fetching: "<code>📂 Fetching files...</code>"
+  list_header: "<b>📂 Google Drive Files:</b>"
+  list_error: "<code>Error fetching file list</code>"
+  no_files: "<code>No files found in Google Drive</code>"
+  search_usage: "<code>Usage: .gsearch &lt;query&gt;</code>"
+  searching: "<code>🔍 Searching...</code>"
+  search_header: "<b>🔍 Search results for '%s':</b>"
+  search_error: "<code>Error searching files</code>"
+  no_results: "<code>No files found for '%s'</code>"
+  download_usage: "<code>Usage: .gdown &lt;file_id or link&gt;</code>"
+  file_not_found: "<code>File not found</code>"
+  download_failed: "<code>Failed to download file</code>"
+  file_caption: "📁 <code>%s</code>"
+  send_error: "<code>Error sending file to Telegram</code>"
+  delete_usage: "<code>Usage: .gdelete &lt;file_id or link&gt;</code>"
+  deleting: "<code>🗑️ Deleting file...</code>"
+  delete_success: "<b>✅ File deleted successfully!</b>"
+  delete_error: "<code>Error deleting file</code>"
+
+fileshare:
+  reply_required: "<code>Reply to a file to upload</code>"
+  fetch_error: "<code>Error fetching reply message</code>"
+  no_media: "<code>No media found in the replied message</code>"
+  downloading: "<code>📥 Downloading file...</code>"
+  download_error: "<code>Error downloading file</code>"
+  uploading: "<code>📤 Uploading file...</code>"
+  upload_success: |
+    <b>✅ Uploaded to %s!</b>
+
+    <b>Link:</b> %s
+  upload_error: "<code>Upload failed: %s</code>"
+
+audiotools:
+  reply_required: "<code>Reply to an audio/video file</code>"
+  fetch_error: "<code>Error fetching reply message</code>"
+  no_audio: "<code>No audio found in the replied message</code>"
+  no_video: "<code>No video found in the replied message</code>"
+  no_voice: "<code>No voice message found</code>"
+  ffmpeg_missing: "<code>FFmpeg is not installed</code>"
+  downloading: "<code>📥 Downloading...</code>"
+  download_error: "<code>Error downloading file</code>"
+  processing: "<code>⚙️ Processing...</code>"
+  converting: "<code>🔄 Converting...</code>"
+  extracting: "<code>🎵 Extracting audio...</code>"
+  uploading: "<code>📤 Uploading...</code>"
+  upload_error: "<code>Error uploading file</code>"
+  process_error: "<code>Processing failed: %s</code>"
+  trim_usage: |
+    <b>Usage:</b> <code>.atrim &lt;start&gt; &lt;end&gt;</code>
+
+    <b>Example:</b> <code>.atrim 00:00:10 00:01:30</code>
+    (Trims from 10 seconds to 1 minute 30 seconds)
+  convert_usage: |
+    <b>Usage:</b> <code>.aconvert &lt;format&gt;</code>
+
+    <b>Supported formats:</b> mp3, wav, ogg, flac, aac, m4a, opus
+  bitrate_usage: |
+    <b>Usage:</b> <code>.abitrate &lt;bitrate&gt;</code>
+
+    <b>Example:</b> <code>.abitrate 320</code>
+    (Valid range: 32-320 kbps)
+  speed_usage: |
+    <b>Usage:</b> <code>.aspeed &lt;speed&gt;</code>
+
+    <b>Example:</b> <code>.aspeed 1.5</code>
+    (Valid range: 0.5-2.0x)
+  invalid_time_format: "<code>Invalid time format. Use HH:MM:SS or MM:SS format.</code>"
+
+paste:
+  usage: |
+    <b>Usage:</b> <code>.paste &lt;text&gt;</code>
+    Or reply to a text message or file
+
+    <b>Flags:</b>
+    <code>-p nekobin</code> - Use Nekobin
+    <code>-p spacebin</code> - Use Spacebin
+    <code>-p gist</code> - Use GitHub Gist (requires GIT_TOKEN)
+    <code>-p srht</code> - Use paste.sr.ht
+    <code>-p dpaste</code> - Use dpaste.org
+    <code>-p 0x0</code> - Use 0x0.st
+    <code>-p pasters</code> - Use paste.rs
+    <code>-p pastesdev</code> - Use pastes.dev
+
+    <b>Examples:</b>
+    <code>.paste Hello World</code>
+    <code>.paste -p gist &lt;text&gt;</code>
+  uploading: "<code>📤 Pasting content...</code>"
+  downloading: "<code>📥 Downloading file...</code>"
+  fetch_error: "<code>Error fetching reply message</code>"
+  download_error: "<code>Error downloading file</code>"
+  read_error: "<code>Error reading file content</code>"
+  upload_error: "<code>Paste failed: %s</code>"
+  no_content: "<code>No content to paste</code>"
+  unsupported_media: "<code>Unsupported media type. Only text files are supported.</code>"
+  file_too_large: "<code>File is too large. Maximum size is 10MB.</code>"
+  content_too_large: "<code>Content is too large. Maximum size is 10MB.</code>"
+  success: |
+    <b>✅ Pasted to %s!</b>
+
+    <b>Link:</b> %s
+
+read:
+  reply_required: "<code>Reply to a file to read its content</code>"
+  fetch_error: "<code>Error fetching reply message</code>"
+  no_file: "<code>No file found in the replied message</code>"
+  downloading: "<code>📥 Downloading file...</code>"
+  download_error: "<code>Error downloading file</code>"
+  read_error: "<code>Error reading file content</code>"
+  file_too_large: "<code>File is too large. Maximum size is 10MB.</code>"
+  result: |
+    <b>📄 File:</b> <code>%s</code>
+    <b>Lines:</b> <code>%d</code>
+
+    <pre>%s</pre>
+
+files:
+  no_fileid: "<code>Please provide a FileID</code>"
+  resolve_error: "<code>Error resolving FileID: %s</code>"
+  reply_required: "<code>Reply to a file</code>"
+  fetch_error: "<code>Error fetching reply message</code>"
+  no_file: "<code>No file found in the reply</code>"
+  fileid_result: "<b>FileID:</b> <code>%s</code>"
+  no_filename: "<code>Please provide a filename</code>"
+  file_not_found: "<code>File not found</code>"
+  uploading: "<code>📤 Uploading...</code>"
+  upload_error: "<code>Upload failed: %s</code>"
+  upload_success: "<b>✅ Uploaded</b> <code>%s</code> in <code>%s</code>"
+  reply_or_link: "<code>Reply to a file or provide a t.me link</code>"
+  invalid_link: "<code>Invalid message link</code>"
+  downloading: "<code>📥 Downloading...</code>"
+  downloading_from: "<code>📥 Downloading from %s message %d...</code>"
+  download_cancelled: "<code>Download cancelled</code>"
+  download_error: "<code>Download failed: %s</code>"
+  download_success: "<b>✅ Downloaded</b> <code>%s</code> in <code>%s</code>"
+  reply_to_download: "<code>Reply to a download message to cancel it</code>"
+  no_active_download: "<code>No active download found for this message</code>"
+  cancelled: "<code>Download cancelled!</code>"
+
+imdb:
+  usage: |
+    <b>Usage:</b> <code>.imdb &lt;movie/series name&gt;</code>
+    <code>.imdb tt1234567</code> (direct IMDb ID)
+  fetching: "<code>🎬 Fetching IMDb data...</code>"
+  fetch_error: "<code>Error fetching IMDb data</code>"
+  no_results: "<code>No results found for '%s'</code>"
+  no_query_title: "No Query"
+  no_query_desc: "Please enter a movie or series name to search"
+  no_results_title: "No Results"
+  no_results_desc: "No results found for your query"
+  search_btn: "🔍 Search IMDb"
+  search_again_btn: "🔍 Search again"
+  invalid_data: "Invalid IMDb data"
+  not_allowed_title: "Not Allowed"
+  not_allowed: "You are not allowed to use this feature"
+  search_results_title: "🔍 IMDB Search Results"
+  search_results_desc: "Found %d results for: %s"
+  search_results_text: "🔍 <b>Search Results:</b>\n\nSelect a title below to view details."
+  error_title: "Error"
+  error_desc: "Failed to fetch IMDb search results"
+
+imagetools:
+  reply_required: "<code>Reply to a photo or sticker</code>"
+  fetch_error: "<code>Error fetching reply message</code>"
+  no_image: "<code>No image found in the replied message</code>"
+  imagemagick_missing: "<code>ImageMagick is not installed</code>"
+  downloading: "<code>📥 Downloading...</code>"
+  download_error: "<code>Error downloading file</code>"
+  processing: "<code>⚙️ Processing...</code>"
+  process_error: "<code>Processing failed: %s</code>"
+  uploading: "<code>📤 Uploading...</code>"
+  upload_error: "<code>Error uploading file</code>"
+  resize_usage: |
+    <b>Usage:</b> <code>.resize &lt;size&gt;</code>
+    Examples: <code>.resize 500x500</code>, <code>.resize 50%</code>
+  csample_usage: |
+    <b>Usage:</b> <code>.csample &lt;color&gt;</code>
+    Examples: <code>.csample red</code>, <code>.csample #FF5733</code>
+  invalid_color: "<code>Invalid color name or hex code</code>"
+  csample_result: "🎨 Color sample for <code>%s</code>"
+
+profile:
+  setname_usage: |
+    <b>Usage:</b> <code>.setname &lt;first name&gt;</code>
+    <code>.setname &lt;first&gt; 
+  setbio_usage: "<code>Usage: .setbio &lt;bio text&gt;</code>"
+  reply_required: "<code>Reply to a photo or video</code>"
+  fetch_error: "<code>Error fetching reply message</code>"
+  no_media: "<code>No photo or video found</code>"
+  updating: "<code>⏳ Updating...</code>"
+  update_error: "<code>Update failed: %s</code>"
+  name_changed: "<b>✅ Name changed to:</b> <code>%s</code>"
+  bio_changed: "<b>✅ Bio changed to:</b> <code>%s</code>"
+  downloading: "<code>📥 Downloading...</code>"
+  download_error: "<code>Error downloading file</code>"
+  uploading: "<code>📤 Uploading...</code>"
+  upload_error: "<code>Error uploading file</code>"
+  pic_changed: "<b>✅ Profile picture changed!</b>"
+  deleting: "<code>🗑️ Deleting profile picture(s)...</code>"
+  no_pfp: "<code>No profile pictures to delete</code>"
+  pfp_deleted: "<b>✅ Deleted %d profile picture(s)</b>"
+  fetching: "<code>📥 Fetching profile picture(s)...</code>"
+  no_pfp_found: "<code>No profile picture found</code>"
+  user_not_found: "<code>User not found</code>"
+
+mediatools:
+  reply_required: "<code>Reply to a media file</code>"
+  fetch_error: "<code>Error fetching reply message</code>"
+  no_media: "<code>No media found in the replied message</code>"
+  no_video: "<code>No video found in the replied message</code>"
+  no_video_photo: "<code>Reply to a video or photo</code>"
+  ffmpeg_missing: "<code>FFmpeg is not installed</code>"
+  analyzing: "<code>🔍 Analyzing media...</code>"
+  downloading: "<code>📥 Downloading...</code>"
+  download_error: "<code>Error downloading file</code>"
+  processing: "<code>⚙️ Processing...</code>"
+  compressing: "<code>📦 Compressing...</code>"
+  converting: "<code>🔄 Converting...</code>"
+  process_error: "<code>Processing failed: %s</code>"
+  uploading: "<code>📤 Uploading...</code>"
+  upload_error: "<code>Error uploading file</code>"
+  info_result: "<pre>%s</pre>"
+  vtrim_usage: |
+    <b>Usage:</b> <code>.vtrim &lt;start&gt; &lt;end&gt;</code>
+    Example: <code>.vtrim 00:00:10 00:01:30</code>

@@ -1,0 +1,78 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Go workspace file
+go.work
+
+# Go modules
+vendor/
+
+# Go build artifacts
+*.a
+*.o
+*.so
+
+# mtproto bot specific files
+*.session
+*.db
+*.json
+
+# Environment variables
+.env
+
+# Build artifacts
+novauserbot
+NovaUserbot
+main
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+bot_logs.log
+bot_logs.json
+gogram_logs.txt
+
+# Data directory
+data/
+
+# Temporary files
+tmp/
+*.tmp
+
+# Media files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.webp
+*.svg
+*.ico
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mp3
+*.wav
+*.flac
+*.aac
+*.ogg
+*.m4a
+*.wma
+*.tgs
+*.sticker
