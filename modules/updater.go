@@ -1,8 +1,12 @@
 package modules
 
 import (
+	"NovaUserbot/locales"
 	"NovaUserbot/utils"
 	"fmt"
+	"strings"
+
+	"github.com/amarnathcjd/gogram/telegram"
 )
 
 const (
@@ -10,34 +14,56 @@ const (
 	branch  = "dev"
 )
 
-func checkForUpstreamChanges() (string, error) {
-	fetchCmd := fmt.Sprintf("git fetch %s", repoURL)
-	_, err := utils.RunCommand(fetchCmd)
-	if err != nil {
-		return "", fmt.Errorf("failed to fetch from upstream: %w", err)
-	}
-
-	diffCmd := fmt.Sprintf("git diff HEAD origin/%s", branch)
-	diffOutput, err := utils.RunCommand(diffCmd)
-	if err != nil {
-		return "", fmt.Errorf("failed to check for differences: %w", err)
-	}
-
-	return diffOutput, nil
+func init() {
+	RegisterModule("Updater", loadUpdaterModule)
 }
 
-func resetAndPullLatest() error {
-	resetCmd := "git reset --hard"
-	_, err := utils.RunCommand(resetCmd)
+func checkUpdate(m *telegram.NewMessage) error {
+	msg, _ := eOR(m, locales.Tr("updater.checking"))
+
+	_, err := utils.RunCommand(fmt.Sprintf("git fetch %s", repoURL))
 	if err != nil {
-		return fmt.Errorf("failed to reset local changes: %w", err)
+		_, err = msg.Edit(locales.Trf("updater.update_error", err.Error()))
+		return err
 	}
 
-	pullCmd := fmt.Sprintf("git pull %s %s", repoURL, branch)
-	_, err = utils.RunCommand(pullCmd)
+	diffOutput, err := utils.RunCommand(fmt.Sprintf("git diff HEAD origin/%s", branch))
 	if err != nil {
-		return fmt.Errorf("failed to pull latest updates: %w", err)
+		_, err = msg.Edit(locales.Trf("updater.update_error", err.Error()))
+		return err
 	}
 
-	return nil
+	if strings.TrimSpace(diffOutput) == "" {
+		_, err = msg.Edit(locales.Tr("updater.up_to_date"))
+		return err
+	}
+
+	args := m.Args()
+	if args == "force" {
+		_, _ = msg.Edit(locales.Tr("updater.updating"))
+		if _, err := utils.RunCommand("git reset --hard"); err != nil {
+			_, err = msg.Edit(locales.Trf("updater.update_error", err.Error()))
+			return err
+		}
+		if _, err := utils.RunCommand(fmt.Sprintf("git pull %s %s", repoURL, branch)); err != nil {
+			_, err = msg.Edit(locales.Trf("updater.update_error", err.Error()))
+			return err
+		}
+		utils.RunCommand("go build -o main .")
+		restartBot()
+		return nil
+	}
+
+	_, err = msg.Edit(locales.Tr("updater.updates_available"))
+	return err
+}
+
+func loadUpdaterModule() {
+	AddHandler(&Handler{
+		ModuleName:    "Updater",
+		Command:       "update",
+		Description:   "Check for and apply updates",
+		Func:          checkUpdate,
+		DisAllowSudos: true,
+	}, client)
 }

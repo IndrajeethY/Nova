@@ -1,8 +1,8 @@
 package modules
 
 import (
+	"NovaUserbot/locales"
 	"NovaUserbot/utils"
-	"fmt"
 	"os"
 	"strings"
 
@@ -12,93 +12,87 @@ import (
 )
 
 const (
-	promt = "Make sure to give only one word response. The image may contain alphabetical characters, emojis, math problems, or a country flag. If it contains words, just give the word; if it's a math problem, solve it and provide the result with proper sign; if it's an emoji, print it; if it's a country flag, print the country name."
-	cId   = 691070694
+	chatbotPrompt = "Make sure to give only one word response. The image may contain alphabetical characters, emojis, math problems, or a country flag. If it contains words, just give the word; if it's a math problem, solve it and provide the result with proper sign; if it's an emoji, print it; if it's a country flag, print the country name."
+	chatbotID     = 691070694
 )
 
+func init() {
+	RegisterModule("ChatBot", loadChatBotModule)
+}
+
 func OnChatBotMessage(m *telegram.NewMessage) error {
-	if m.Sender.ID != cId {
+	if m.Sender.ID != chatbotID {
 		return nil
 	}
-	if m.Media() != nil {
-		if !strings.Contains(m.Text(), "minutes") {
-			return nil
-		}
-		file, err := m.Client.DownloadMedia(m.Media())
-		if err != nil {
-			log.Error("Error downloading media:", err)
-			return err
-		}
-		result, err := utils.ProcessGemini(file, promt)
-		if err != nil {
-			log.Error("Error processing image and generating content:", err)
-			return err
-		}
-		if m.Message.ReplyMarkup != nil {
-			for _, row := range m.Message.ReplyMarkup.(*telegram.ReplyInlineMarkup).Rows {
-				for _, btns := range row.Buttons {
-					btn, ok := btns.(*telegram.KeyboardButtonCallback)
-					if !ok {
-						log.Error("Error casting button to KeyboardButtonCallback")
-						continue
-					}
-					btnText := strings.TrimSpace(btn.Text)
-					resultText := strings.TrimSpace(result)
-					btnText = strings.ReplaceAll(btnText, "\n", "")
-					btnText = strings.ReplaceAll(btnText, "\r", "")
-					resultText = strings.ReplaceAll(resultText, "\n", "")
-					resultText = strings.ReplaceAll(resultText, "\r", "")
-					if strings.Contains(strings.ToLower(btnText), strings.ToLower(resultText)) {
-						_, err = m.Click(btn.Data)
-						return err
-					}
-				}
-			}
-		} else {
-			_, err = m.Respond(result)
-		}
+	if m.Media() == nil || !strings.Contains(m.Text(), "minutes") {
+		return nil
+	}
+	file, err := m.Client.DownloadMedia(m.Media())
+	if err != nil {
+		log.Error("Error downloading media:", err)
 		return err
 	}
-	return nil
+	result, err := utils.ProcessGemini(file, chatbotPrompt)
+	if err != nil {
+		log.Error("Error processing image:", err)
+		return err
+	}
+	if m.Message.ReplyMarkup != nil {
+		for _, row := range m.Message.ReplyMarkup.(*telegram.ReplyInlineMarkup).Rows {
+			for _, btns := range row.Buttons {
+				btn, ok := btns.(*telegram.KeyboardButtonCallback)
+				if !ok {
+					continue
+				}
+				btnText := strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(btn.Text, "\n", ""), "\r", ""))
+				resultText := strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(result, "\n", ""), "\r", ""))
+				if strings.Contains(strings.ToLower(btnText), strings.ToLower(resultText)) {
+					_, err = m.Click(btn.Data)
+					return err
+				}
+			}
+		}
+	} else {
+		_, err = m.Respond(result)
+	}
+	return err
 }
 
 func geminiAi(m *telegram.NewMessage) error {
 	var image string
 	args := m.Args()
-	msg, _ := eOR(m, "<code>Fetching Response...</code>")
+	msg, _ := eOR(m, locales.Tr("chatbot.fetching"))
 	if m.IsReply() {
-		msg, _ := m.GetReplyMessage()
-		if msg.Media() != nil {
-			image, _ = m.Client.DownloadMedia(msg.Media())
-			defer os.Remove(image)
+		reply, _ := m.GetReplyMessage()
+		if reply != nil {
+			if reply.Media() != nil {
+				image, _ = m.Client.DownloadMedia(reply.Media())
+				defer os.Remove(image)
+			}
+			if reply.Text() != "" {
+				args = reply.Text()
+			}
 		}
-		if msg.Text() != "" {
-			args = msg.Text()
-		}
-
 	}
 	if args == "" {
-		_, err := msg.Edit("<code>No Query Provided</code>")
+		_, err := msg.Edit(locales.Tr("chatbot.no_query"))
 		return err
 	}
 	result, err := utils.ProcessGemini(image, args)
 	if err != nil {
-		_, err = msg.Edit("<code>Error Fetching Data</code>")
+		_, err = msg.Edit(locales.Tr("chatbot.error"))
 		return err
 	}
-	_, err = msg.Edit(fmt.Sprintf("**Query:** `%s`\n\n**Response:**\n%s", args, result), telegram.SendOptions{ParseMode: "Markdown"})
+	_, err = msg.Edit(locales.Trf("chatbot.result", args, result), telegram.SendOptions{ParseMode: "Markdown"})
 	return err
 }
 
-func LoadChatBotHandler(c *telegram.Client) {
-	handlers := []*Handler{
-		{
-			ModuleName:  "ChatBot",
-			Command:     "ai",
-			Description: "Fetch response from Gemini AI",
-			Func:        geminiAi,
-		},
-	}
-	AddHandlers(handlers, c)
-	c.On("message", OnChatBotMessage)
+func loadChatBotModule() {
+	AddHandler(&Handler{
+		ModuleName:  "ChatBot",
+		Command:     "ai",
+		Description: "Fetch response from Gemini AI",
+		Func:        geminiAi,
+	}, client)
+	client.On("message", OnChatBotMessage)
 }

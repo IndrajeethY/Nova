@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"NovaUserbot/locales"
 	"NovaUserbot/utils"
 	"bytes"
 	"fmt"
@@ -9,25 +10,27 @@ import (
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
+func init() {
+	RegisterModule("Ping", loadPingModule)
+}
+
 func ping(ip string) (string, error) {
 	out, err := utils.RunCommand(fmt.Sprintf("ping -c 1 -W 1 %s", ip))
 	if err != nil {
 		return "", err
 	}
-
-	if len(out) > 0 && out != "" {
+	if len(out) > 0 {
 		start := bytes.Index([]byte(out), []byte("time=")) + 5
 		end := bytes.Index([]byte(out[start:]), []byte(" ms"))
 		if start > 0 && end > 0 {
 			return out[start : start+end], nil
 		}
 	}
-
 	return "timeout", nil
 }
 
 func DCPingHandler(m *telegram.NewMessage) error {
-	msg, err := eOR(m, "<code>Pinging all DCs...</code>")
+	msg, err := eOR(m, locales.Tr("ping.dc_pinging"))
 	if err != nil {
 		return err
 	}
@@ -40,13 +43,13 @@ func DCPingHandler(m *telegram.NewMessage) error {
 		"DC5 (SIN, Singapore, SG)": "91.108.56.130",
 	}
 
-	response := "<b>Data Center Pings:</b>\n"
+	response := locales.Tr("ping.dc_header")
 	for dcName, dcIP := range dcs {
 		pingTime, err := ping(dcIP)
 		if err != nil {
-			response += fmt.Sprintf("<b>%s:</b> <code>Failed to ping</code>\n", dcName)
+			response += fmt.Sprintf(locales.Tr("ping.dc_failed"), dcName)
 		} else {
-			response += fmt.Sprintf("<b>%s:</b> <code>%s</code> ms\n", dcName, pingTime)
+			response += fmt.Sprintf(locales.Tr("ping.dc_entry"), dcName, pingTime)
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
@@ -58,28 +61,18 @@ func DCPingHandler(m *telegram.NewMessage) error {
 func PingHandler(m *telegram.NewMessage) error {
 	msgTime := m.OriginalUpdate.(*telegram.MessageObj).Date
 	duration := time.Since(time.Unix(int64(msgTime), 0))
-	msg, err := eOR(m, "<code>Pinging...</code>")
+	msg, err := eOR(m, locales.Tr("ping.pinging"))
 	if err != nil {
 		return err
 	}
-	_, err = msg.Edit(fmt.Sprintf("<b>Pong!</b>\n<b>Time taken:</b> <code>%v</code>ms\n<b>Uptime:</b> <code>%v</code>", duration.Milliseconds(), time.Since(startTime).Truncate(time.Second)))
+	_, err = msg.Edit(locales.Trf("ping.result", duration.Milliseconds(), time.Since(startTime).Truncate(time.Second)))
 	return err
 }
 
-func LoadPingHandler(c *telegram.Client) {
+func loadPingModule() {
 	handlers := []*Handler{
-		{
-			ModuleName:  "Ping Cmds",
-			Command:     "ping",
-			Description: "Ping the userbot",
-			Func:        PingHandler,
-		},
-		{
-			ModuleName:  "Ping Cmds",
-			Command:     "dcping",
-			Description: "Ping all data centers",
-			Func:        DCPingHandler,
-		},
+		{ModuleName: "Ping", Command: "ping", Description: "Ping the userbot", Func: PingHandler},
+		{ModuleName: "Ping", Command: "dcping", Description: "Ping all data centers", Func: DCPingHandler},
 	}
-	AddHandlers(handlers, c)
+	AddHandlers(handlers, client)
 }

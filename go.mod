@@ -1,9 +1,9 @@
 module NovaUserbot
 
-go 1.23.3
+go 1.24.0
 
 require (
-	github.com/amarnathcjd/gogram v1.5.9-0.20250302123141-28dcef35c744
+	github.com/amarnathcjd/gogram v1.6.2
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/google/generative-ai-go v0.19.0
 	github.com/joho/godotenv v1.5.1
@@ -11,6 +11,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	google.golang.org/api v0.213.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -35,12 +36,12 @@ require (
 	go.opentelemetry.io/otel v1.29.0 // indirect
 	go.opentelemetry.io/otel/metric v1.29.0 // indirect
 	go.opentelemetry.io/otel/trace v1.29.0 // indirect
-	golang.org/x/crypto v0.33.0 // indirect
-	golang.org/x/net v0.35.0 // indirect
+	golang.org/x/crypto v0.40.0 // indirect
+	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
-	golang.org/x/sync v0.11.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/text v0.27.0 // indirect
 	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241104194629-dd2ea8efbc28 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect

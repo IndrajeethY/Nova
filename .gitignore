@@ -1,28 +1,25 @@
-# Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
-
-# Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-# Go workspace file
 go.work
 
-# Go modules
 vendor/
 
-# Go build artifacts
 *.a
 *.o
-*.so
 
-# mtproto bot specific files
 *.session
+session.dat
 *.db
-*.json
+bot_logs.json
 
-# Environment variables
 .env
+.claude/
+
+tmp/
+out.txt
+message.json

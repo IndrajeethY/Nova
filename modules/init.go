@@ -3,6 +3,7 @@ package modules
 import (
 	"NovaUserbot/config"
 	"NovaUserbot/db"
+	"NovaUserbot/locales"
 	"fmt"
 	"io"
 	"os"
@@ -13,12 +14,7 @@ import (
 )
 
 func setupLogger() error {
-	if _, err := os.Stat("bot_logs.json"); err == nil {
-		err = os.Remove("bot_logs.json")
-		if err != nil {
-			return fmt.Errorf("failed to remove existing log file: %v", err)
-		}
-	}
+	os.Remove("bot_logs.json")
 	logFile := &lumberjack.Logger{
 		Filename:   "bot_logs.json",
 		MaxSize:    10,
@@ -26,48 +22,60 @@ func setupLogger() error {
 		MaxAge:     28,
 		Compress:   true,
 	}
-
-	multiWriter := io.MultiWriter(os.Stdout, logFile)
-	log.SetOutput(multiWriter)
-	log.SetFormatter(&log.JSONFormatter{
-		PrettyPrint: true,
-	})
+	log.SetOutput(io.MultiWriter(os.Stdout, logFile))
+	log.SetFormatter(&log.JSONFormatter{PrettyPrint: true})
 	log.SetLevel(log.InfoLevel)
-
 	return nil
 }
 
 func InitUb() {
-	var err error
-	if err = setupLogger(); err != nil {
+	if err := setupLogger(); err != nil {
 		fmt.Println("Error setting up logger:", err)
 	}
-	log.Println("Logger set up")
-	cfg, err = config.LoadConfig()
+
+	var err error
+	cfg, err = config.Load()
 	if err != nil {
-		log.Println("Error loading config:", err)
+		log.Fatalf("Failed to load config: %v", err)
 	}
 	log.Println("Config loaded")
-	Db, err = db.InitDB(cfg.DbUrl)
+
+	Db, err = db.InitDB(cfg.DbURL)
 	if err != nil {
-		log.Println("Error initializing database:", err)
+		log.Fatalf("Failed to connect to Redis: %v", err)
 	}
-	log.Println("Database initialized")
-	if sudos, err := Db.SMembers(Db.Context(), "SUDOS").Result(); err != nil {
-		for _, sudo := range sudos {
-			sudoId, _ := strconv.ParseInt(sudo, 10, 64)
-			sudoers = append(sudoers, sudoId)
+	log.Println("Database connected")
+
+	if err := locales.Init(Db); err != nil {
+		log.Warnf("Failed to load locales: %v", err)
+	}
+
+	loadSudoers()
+
+	c, err := InitTgClients()
+	if err != nil {
+		log.Fatalf("Failed to initialize Telegram clients: %v", err)
+	}
+
+	log.Println("NovaUserbot is running")
+	c.Idle()
+	tgbot.Stop()
+	c.Stop()
+	log.Println("NovaUserbot stopped")
+}
+
+func loadSudoers() {
+	sudos, err := Db.SMembers(Db.Context(), "SUDOS").Result()
+	if err != nil {
+		log.Warnf("Could not load sudoers: %v", err)
+		return
+	}
+	for _, s := range sudos {
+		id, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			continue
 		}
-		log.Println("Error fetching sudoers:", err)
+		sudoers = append(sudoers, id)
 	}
-	log.Println("Loaded sudoers:", len(sudoers))
-	if client, err := InitTgClients(); err != nil {
-		log.Println("Error initializing Telegram clients:", err)
-	} else {
-		log.Println("Telegram clients initialized")
-		client.Idle()
-		tgbot.Stop()
-		client.Stop()
-		log.Println("Userbot stopped")
-	}
+	log.Printf("Loaded %d sudoers", len(sudoers))
 }

@@ -4,8 +4,6 @@ import (
 	"NovaUserbot/config"
 	"context"
 	"fmt"
-	"reflect"
-	"runtime"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -23,98 +21,64 @@ var (
 	tbotId    int64
 	sudoers   []int64
 	startTime = time.Now()
-	cfg       *config.ConfigType
+	cfg       *config.Config
 	Db        *redis.Client
 )
 
-const (
-	// Version of the bot
-	NovaVersion = "1.0.0"
-)
+const NovaVersion = "1.1.0"
 
 func InitTgClients() (*telegram.Client, error) {
 	client, _ = telegram.NewClient(telegram.ClientConfig{
-		AppID:         cfg.ApiId,
-		AppHash:       cfg.ApiHash,
-		LogLevel:      telegram.LogInfo,
-		StringSession: cfg.StringSession,
-		MemorySession: true,
-		SessionName:   "asstub",
+		AppID:       cfg.ApiID,
+		AppHash:     cfg.ApiHash,
+		LogLevel:    telegram.LogInfo,
+		SessionName: "asstub",
 	})
-	if err := client.Connect(); err != nil {
-		log.Println("Error connecting userbot to Telegram:", err)
-	}
 	if err := client.Start(); err != nil {
-		log.Println("Error starting userbot:", err)
+		return nil, fmt.Errorf("failed to start userbot: %w", err)
 	}
+
 	tgbot, _ = telegram.NewClient(telegram.ClientConfig{
-		AppID:       cfg.ApiId,
+		AppID:       cfg.ApiID,
 		AppHash:     cfg.ApiHash,
 		LogLevel:    telegram.LogInfo,
 		SessionName: "asstbot",
 		Session:     "asstbot.db",
 	})
 	if err := tgbot.Connect(); err != nil {
-		log.Println("Error connecting bot to Telegram:", err)
-		return nil, err
-
+		return nil, fmt.Errorf("failed to connect bot: %w", err)
 	}
-	if err := tgbot.LoginBot(cfg.Token); err != nil {
-		log.Println("Error logging in bot:", err)
-		return nil, err
+	if err := tgbot.LoginBot(cfg.BotToken); err != nil {
+		return nil, fmt.Errorf("failed to login bot: %w", err)
 	}
 
 	user, _ := client.GetMe()
-	log.Println("Logged in as", user.Username)
+	log.Printf("Userbot logged in as @%s (%d)", user.Username, user.ID)
 	ubId = user.ID
+
 	bot, _ := tgbot.GetMe()
-	log.Println("Logged in as", bot.Username)
+	log.Printf("Bot logged in as @%s (%d)", bot.Username, bot.ID)
 	tbotId = bot.ID
 
-	loadAllModules(client)
+	loadAllModules()
+	logMessage("NovaUserbot started in " + time.Since(startTime).String())
 	return client, nil
 }
 
-// Need a better way to load modules
-
-func loadAllModules(client *telegram.Client) {
-	modules := []func(*telegram.Client){
-		LoadAdminModule,
-		LoadAliveCmd,
-		LoadChatBotHandler,
-		LoadDbCmds,
-		LoadGbanHandler,
-		LoadMisc,
-		LoadMyinfo,
-		LoadPingHandler,
-		LoadPmAssistantHandler,
-		LoadShellHandler,
-		LoadSudoModule,
-		LoadTagLogger,
-	}
-
-	for _, load := range modules {
-		name := runtime.FuncForPC(reflect.ValueOf(load).Pointer()).Name()
-		log.Println("Loading module", name)
-		load(client)
-	}
-	LoadHelpHandler(client)
-	logMessage("NovaUserbot started in " + time.Since(startTime).String())
-}
-
-func AddHandlers(handlers []*Handler, client *telegram.Client) {
+func AddHandlers(handlers []*Handler, c *telegram.Client) {
 	for _, h := range handlers {
-		AddHandler(h, client)
+		AddHandler(h, c)
 	}
 }
 
-func AddHandler(h *Handler, client *telegram.Client) {
+func AddHandler(h *Handler, c *telegram.Client) {
 	if h.Command != "" {
-		cmD := Db.Get(context.Background(), "CMD_HANDLER").Val()
-		if cmD == "" {
-			cmD = "."
+		cmdPrefix := Db.Get(context.Background(), "CMD_HANDLER").Val()
+		if cmdPrefix == "" {
+			cmdPrefix = "."
 		}
-		client.On(fmt.Sprintf("message:%s%s( (.*)|$)", cmD, h.Command), h.Func, telegram.FilterFunc(func(m *telegram.NewMessage) bool {
+		pattern := fmt.Sprintf("message:%s%s( (.*)|$)", cmdPrefix, h.Command)
+		c.On(pattern, h.Func, telegram.FilterFunc(func(m *telegram.NewMessage) bool {
 			return m.Sender.ID == ubId || (utils.IsIn64Array(sudoers, m.Sender.ID) && !h.DisAllowSudos)
 		}))
 	}

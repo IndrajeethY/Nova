@@ -1,41 +1,62 @@
 package config
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/joho/godotenv"
 )
 
-type ConfigType struct {
-	ApiId         int32
+type Config struct {
+	ApiID         int32
 	ApiHash       string
-	DbUrl         string
-	Token         string
+	DbURL         string
+	BotToken      string
 	StringSession string
+	GeminiKey     string
 }
 
-var Config *ConfigType
+var Cfg *Config
 
-func LoadConfig() (*ConfigType, error) {
-	err := godotenv.Load()
+func Load() (*Config, error) {
+	_ = godotenv.Load()
+
+	apiID, err := strconv.Atoi(getEnv("API_ID", ""))
 	if err != nil {
-		log.Fatalf("Error loading .env file")
-		return nil, err
+		return nil, fmt.Errorf("API_ID must be a valid integer: %w", err)
 	}
 
-	apiId, err := strconv.Atoi(os.Getenv("API_ID"))
-	if err != nil {
-		log.Fatalf("Error parsing API_ID")
-	}
-	Config = &ConfigType{
-		ApiId:         int32(apiId),
-		ApiHash:       os.Getenv("API_HASH"),
-		DbUrl:         os.Getenv("DB_URL"),
-		Token:         os.Getenv("TOKEN"),
-		StringSession: os.Getenv("STRING_SESSION"),
+	cfg := &Config{
+		ApiID:         int32(apiID),
+		ApiHash:       requireEnv("API_HASH"),
+		DbURL:         requireEnv("DB_URL"),
+		BotToken:      requireEnv("TOKEN"),
+		StringSession: getEnv("STRING_SESSION", ""),
+		GeminiKey:     getEnv("API_KEY", ""),
 	}
 
-	return Config, nil
+	if cfg.ApiHash == "" {
+		return nil, fmt.Errorf("API_HASH is required")
+	}
+	if cfg.DbURL == "" {
+		return nil, fmt.Errorf("DB_URL is required")
+	}
+	if cfg.BotToken == "" {
+		return nil, fmt.Errorf("TOKEN is required")
+	}
+
+	Cfg = cfg
+	return cfg, nil
+}
+
+func getEnv(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
+
+func requireEnv(key string) string {
+	return os.Getenv(key)
 }

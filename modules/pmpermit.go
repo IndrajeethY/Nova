@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"NovaUserbot/locales"
 	"NovaUserbot/utils"
 	"context"
 	"fmt"
@@ -17,6 +18,10 @@ var (
 	countMutex    sync.Mutex
 	responseMutex sync.Mutex
 )
+
+func init() {
+	RegisterModule("PM Permit", loadPmPermitModule)
+}
 
 func OnPrivateMessage(m *telegram.NewMessage) error {
 	if !m.IsPrivate() || m.Sender.Bot || m.Sender.Contact {
@@ -37,7 +42,7 @@ func OnPrivateMessage(m *telegram.NewMessage) error {
 	count := messageCounts[userID]
 	if count >= 3 {
 		countMutex.Unlock()
-		_, _ = m.Reply(fmt.Sprintf("You've reached your message limit. You will be temporarily blocked from messaging %s.", client.Me().FirstName))
+		_, _ = m.Reply(locales.Trf("pm_permit.message_limit", client.Me().FirstName))
 		peer, _ := m.Client.GetSendablePeer(userID)
 		_, err := m.Client.ContactsBlock(false, peer)
 		if err != nil {
@@ -87,104 +92,66 @@ func OnPrivateMessage(m *telegram.NewMessage) error {
 func ApproveUser(m *telegram.NewMessage) error {
 	userID, name := ExtractUser(m)
 	if userID == 0 {
-		_, err := eOR(m, "Invalid user ID.")
+		_, err := eOR(m, locales.Tr("pm_permit.invalid_user"))
 		return err
 	}
 	if Db.SIsMember(context.Background(), "APPROVED_USERS", userID).Val() {
-		_, err := eOR(m, fmt.Sprintf("User <a href='tg://user?id=%d'>%s</a> is already approved to pm.", userID, name))
-		return err
-	} else {
-		err := Db.SAdd(context.Background(), "APPROVED_USERS", userID).Err()
-		if err != nil {
-			_, err = eOR(m, "Error approving user.")
-			return err
-		}
-		_, err = eOR(m, fmt.Sprintf("User <a href='tg://user?id=%d'>%s</a> approved to pm.", userID, name))
+		_, err := eOR(m, locales.Trf("pm_permit.already_approved", userID, name))
 		return err
 	}
+	err := Db.SAdd(context.Background(), "APPROVED_USERS", userID).Err()
+	if err != nil {
+		_, err = eOR(m, locales.Tr("pm_permit.approve_error"))
+		return err
+	}
+	_, err = eOR(m, locales.Trf("pm_permit.approved", userID, name))
+	return err
 }
 
 func DisapproveUser(m *telegram.NewMessage) error {
 	userId, name := ExtractUser(m)
 	if userId == 0 {
-		_, err := eOR(m, "Invalid user ID.")
+		_, err := eOR(m, locales.Tr("pm_permit.invalid_user"))
 		return err
 	}
 	if !Db.SIsMember(context.Background(), "APPROVED_USERS", userId).Val() {
-		_, err := eOR(m, fmt.Sprintf("User <a href='tg://user?id=%d'>%s</a> is not approved.", userId, name))
+		_, err := eOR(m, locales.Trf("pm_permit.not_approved", userId, name))
 		return err
 	}
 	err := Db.SRem(context.Background(), "APPROVED_USERS", userId).Err()
 	if err != nil {
-		_, err = eOR(m, "Error disapproving user.")
+		_, err = eOR(m, locales.Tr("pm_permit.disapprove_error"))
 		return err
 	}
-	_, err = eOR(m, fmt.Sprintf("User <a href='tg://user?id=%d'>%s</a> disapproved.", userId, name))
+	_, err = eOR(m, locales.Trf("pm_permit.disapproved", userId, name))
 	return err
 }
 
 func ApprovedUsers(m *telegram.NewMessage) error {
-	config, err := Db.SMembers(context.Background(), "APPROVED_USERS").Result()
+	ids, err := Db.SMembers(context.Background(), "APPROVED_USERS").Result()
 	if err != nil {
-		_, err = eOR(m, "Error fetching approved users.")
+		_, err = eOR(m, locales.Tr("pm_permit.fetch_error"))
 		return err
 	}
-	msg, _ := eOR(m, "<code>Fetching approved users...</code>")
-	output := "<b>Approved users:</b>\n"
-	for _, id := range config {
+	msg, _ := eOR(m, locales.Tr("pm_permit.fetching"))
+	output := locales.Tr("pm_permit.list_header")
+	for _, id := range ids {
 		user, err := m.Client.GetUser(utils.StringToInt64(id))
 		if err != nil {
-			log.Error("Error getting user info:", err)
 			continue
 		}
-		output += fmt.Sprintf("<a href='tg://user?id=%d'>%s</a>\n", utils.StringToInt64(id), user.FirstName+" "+user.LastName)
+		output += fmt.Sprintf(locales.Tr("pm_permit.list_entry"), utils.StringToInt64(id), user.FirstName+" "+user.LastName)
 	}
 	_, err = msg.Edit(output)
 	return err
 }
 
-func SetPromt(m *telegram.NewMessage) error {
-	prompt := m.Args()
-	if prompt == "" {
-		_, err := eOR(m, "Usage: .setprompt <prompt>")
-		return err
-	}
-	err := Db.Set(context.Background(), "PM_AI_PROMT", prompt, 0).Err()
-	if err != nil {
-		_, err = eOR(m, "Error setting prompt.")
-		return err
-	}
-	_, err = eOR(m, "Prompt set successfully.")
-	return err
-}
-
-func LoadPmAssistantHandler(c *telegram.Client) {
+func loadPmPermitModule() {
 	handlers := []*Handler{
-		{
-			ModuleName:  "Pm Permit",
-			Command:     "ap",
-			Description: "Approve a user to bypass the assistant prompt",
-			Func:        ApproveUser,
-		},
-		{
-			ModuleName:  "Pm Permit",
-			Command:     "dap",
-			Description: "Disapprove a user to receive the assistant prompt",
-			Func:        DisapproveUser,
-		},
-		{
-			ModuleName:  "Pm Permit",
-			Command:     "approved",
-			Description: "List approved users",
-			Func:        ApprovedUsers,
-		},
-		{
-			ModuleName:  "Pm Permit",
-			Command:     "setprompt",
-			Description: "Set the prompt for the pm assistant",
-			Func:        SetPromt,
-		},
+		{ModuleName: "PM Permit", Command: "ap", Description: "Approve a user to bypass PM assistant", Func: ApproveUser},
+		{ModuleName: "PM Permit", Command: "dap", Description: "Disapprove a user", Func: DisapproveUser},
+		{ModuleName: "PM Permit", Command: "approved", Description: "List approved users", Func: ApprovedUsers},
 	}
-	AddHandlers(handlers, c)
-	c.On("message", OnPrivateMessage)
+	AddHandlers(handlers, client)
+	client.On("message", OnPrivateMessage)
 }

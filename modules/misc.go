@@ -1,51 +1,53 @@
 package modules
 
 import (
+	"NovaUserbot/locales"
 	"NovaUserbot/utils"
-	"fmt"
 	"os"
 
 	"github.com/amarnathcjd/gogram/telegram"
 )
 
+func init() {
+	RegisterModule("Misc", loadMiscModule)
+}
+
 func GenLink(m *telegram.NewMessage) error {
 	if !m.IsReply() {
-		_, err := eOR(m, "Reply to a media message to generate a link.")
+		_, err := eOR(m, locales.Tr("misc.reply_to_media"))
 		return err
 	}
 	reply, err := m.GetReplyMessage()
 	if err != nil {
-		_, err := eOR(m, "An error occurred while fetching the reply message.")
+		_, err := eOR(m, locales.Tr("misc.error_fetching_reply"))
 		return err
 	}
 	if reply.Media() == nil {
-		_, err := eOR(m, "The replied message does not contain any media.")
+		_, err := eOR(m, locales.Tr("misc.no_media"))
 		return err
 	}
-	msg, _ := eOR(m, "Downloading media...")
+	msg, _ := eOR(m, locales.Tr("misc.downloading"))
 	file, err := reply.Download()
-	defer os.Remove(file)
 	if err != nil {
-		_, err := eOR(m, "An error occurred while downloading the media.")
+		_, err := eOR(m, locales.Tr("misc.error_downloading"))
 		return err
 	}
-	msg.Edit("Uploading media...")
+	defer os.Remove(file)
+	msg.Edit(locales.Tr("misc.uploading"))
 	link, err := utils.UploadFileToEnvsSh(file)
 	if err != nil {
 		_, err := eOR(m, err.Error())
 		return err
 	}
-	_, err = msg.Edit(fmt.Sprintf("Successfully uploaded media.\nLink: %s", link))
+	_, err = msg.Edit(locales.Trf("misc.upload_success", link))
 	return err
-
 }
 
-func LoadMisc(c *telegram.Client) {
-	gen := &Handler{
+func loadMiscModule() {
+	AddHandler(&Handler{
 		Command:     "genlink",
-		Description: "Generate a link for the replied media.",
+		Description: "Generate a link for replied media",
 		Func:        GenLink,
 		ModuleName:  "Misc",
-	}
-	AddHandler(gen, c)
+	}, client)
 }

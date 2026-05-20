@@ -1,0 +1,315 @@
+language:
+  name: "English"
+  code: "en"
+
+system:
+  started: "NovaUserbot started in %s"
+
+common:
+  no_reason: "No reason"
+
+alive:
+  message: |
+    <b>Nᴏᴠᴀ Is Aʟɪᴠᴇ!</b>
+
+    <b>Oᴡɴᴇʀ:</b> <code>%s</code> (<code>%d</code>)
+    <b>Sᴜᴅᴏs Cᴏᴜɴᴛ:</b> <code>%d</code>
+    <b>Gᴏ Vᴇʀsɪᴏɴ:</b> <code>%s</code>
+    <b>Gᴏɢʀᴀᴍ Vᴇʀsɪᴏɴ:</b> <code>%s</code>
+    <b>Uᴘᴛɪᴍᴇ:</b> <code>%s</code>
+
+ping:
+  pinging: "<code>Pinging...</code>"
+  dc_pinging: "<code>Pinging all DCs...</code>"
+  result: |
+    <b>Pong!</b>
+    <b>Time taken:</b> <code>%d</code>ms
+    <b>Uptime:</b> <code>%s</code>
+  dc_header: "<b>Data Center Pings:</b>\n"
+  dc_entry: "<b>%s:</b> <code>%s</code> ms\n"
+  dc_failed: "<b>%s:</b> <code>Failed to ping</code>\n"
+
+database:
+  set_success: |
+    <b>Key set successfully:</b>
+    <b>Key:</b> <code>%s</code>
+    <b>Value:</b> <code>%s</code>
+  set_error: "<code>Error setting key</code>"
+  get_result: |
+    <b>Key:</b> <code>%s</code>
+    <b>Value:</b> <code>%s</code>
+  get_not_found: "<code>Key not found</code>"
+  del_success: "<b>Key deleted successfully:</b> <code>%s</code>"
+  del_not_found: "<code>Key not found</code>"
+  list_header: "<b>Total keys:</b> <code>%d</code>\n\n%s"
+  list_entry: "<b>▸</b> <code>%s</code>"
+  list_empty: "<b>No keys found in database</b>"
+  fetch_error: "<code>Error fetching keys</code>"
+  del_all_success: "<b>All keys deleted successfully</b>"
+  del_all_error: "<code>Error deleting keys</code>"
+  usage_setkey: "<code>Usage: .setkey &lt;key&gt; &lt;value&gt;</code>"
+  usage_getkey: "<code>Usage: .getkey &lt;key&gt;</code>"
+  usage_delkey: "<code>Usage: .delkey &lt;key&gt;</code>"
+
+admin:
+  banning: "<code>Banning user...</code>"
+  banned: "<b>Banned <a href='tg://user?id=%d'>%s</a></b>\n<b>Reason:</b> %s"
+  ban_error: "<code>Error banning user</code>"
+  unbanning: "<code>Unbanning user...</code>"
+  unbanned: "<b>Unbanned <a href='tg://user?id=%d'>%s</a></b>"
+  unban_error: "<code>User is not banned</code>"
+  kicking: "<code>Kicking user...</code>"
+  kicked: "<b>Kicked <a href='tg://user?id=%d'>%s</a></b>\n<b>Reason:</b> %s"
+  kick_error: "<code>Error kicking user</code>"
+  muting: "<code>Muting user...</code>"
+  muted: "<b>Muted <a href='tg://user?id=%d'>%s</a></b>"
+  mute_error: "<code>Error muting user</code>"
+  unmuting: "<code>Unmuting user...</code>"
+  unmuted: "<b>Unmuted <a href='tg://user?id=%d'>%s</a></b>"
+  unmute_error: "<code>User is not muted</code>"
+  dmuted: "<b>Muted <a href='tg://user?id=%d'>%s</a></b>\n<b>Reason:</b> %s"
+  dmute_error: "<code>Error muting user</code>"
+  promoting: "<code>Promoting user...</code>"
+  promoted: "<b>Promoted <a href='tg://user?id=%d'>%s</a></b>"
+  promote_error: "<code>Error promoting user</code>"
+  demoting: "<code>Demoting user...</code>"
+  demoted: "<b>Demoted <a href='tg://user?id=%d'>%s</a></b>"
+  demote_error: "<code>Error demoting user</code>"
+  pinned: "<b>Pinned <a href='%s'>this</a> message</b>"
+  pin_error: "<code>Error pinning message</code>"
+  unpinned: "<b>Unpinned <a href='%s'>this</a> message</b>"
+  unpin_error: "<code>Error unpinning message</code>"
+  groups_only: "This command can only be used in groups."
+  usage_ban: "<code>Usage: .ban &lt;user_id&gt; or reply to a user</code>"
+  usage_unban: "<code>Usage: .unban &lt;user_id&gt; or reply to a user</code>"
+  usage_kick: "<code>Usage: .kick &lt;user_id&gt; or reply to a user</code>"
+  usage_mute: "<code>Usage: .mute &lt;user_id&gt; or reply to a user</code>"
+  usage_unmute: "<code>Usage: .unmute &lt;user_id&gt; or reply to a user</code>"
+  usage_dmute: "<code>Usage: .dmute &lt;user_id&gt; or reply to a user</code>"
+  usage_dkick: "<code>Usage: .dkick &lt;user_id&gt; or reply to a user</code>"
+  usage_dban: "<code>Usage: .dban &lt;user_id&gt; or reply to a user</code>"
+  usage_promote: "<code>Usage: .promote &lt;user_id&gt; or reply to a user</code>"
+  usage_fullpromote: "<code>Usage: .fullpromote &lt;user_id&gt; or reply to a user</code>"
+  usage_demote: "<code>Usage: .demote &lt;user_id&gt; or reply to a user</code>"
+  usage_pin: "<code>Usage: .pin (reply to a message)</code>"
+  usage_unpin: "<code>Usage: .unpin (reply to a message)</code>"
+  usage_purge: "<code>Usage: .purge (reply to a message)</code>"
+  usage_del: "<code>Usage: .del (reply to a message)</code>"
+  usage_purgefrom: "<code>Usage: .purgefrom (reply to a message)</code>"
+  usage_purgeto: "<code>Usage: .purgeto (reply to a message)</code>"
+  zombies_searching: "<code>Searching for zombies...</code>"
+  zombies_not_found: "No deleted accounts found."
+  zombies_found: "Found %d zombies. Use <code>.zombies clean</code> to remove them."
+  zombies_cleaned: "Cleaned %d zombies, %d failed."
+  no_permissions: "You don't have enough permissions to use this command."
+  get_permissions_error: "Failed to get your permissions."
+  get_members_error: "Failed to get chat members."
+  purged: "<code>Purged %d messages.</code>"
+  purgefrom_set: "<code>Purge from set.</code>"
+  purgeto_no_start: "<code>No purgefrom set. Use .purgefrom first.</code>"
+  purgeto_wrong_order: "<code>purgefrom must be before purgeto.</code>"
+
+sudo:
+  adding: "<code>Adding sudo...</code>"
+  added: "<b>Added <a href='tg://user?id=%d'>%s</a> as sudo</b>"
+  already_sudo: "<code>User is already a sudo</code>"
+  add_error: "<code>Error adding sudo</code>"
+  deleting: "<code>Deleting sudo...</code>"
+  deleted: "<b>Removed <a href='tg://user?id=%d'>%s</a> from sudo</b>"
+  not_sudo: "<code>User is not a sudo</code>"
+  del_error: "<code>Error deleting sudo</code>"
+  fetching: "<code>Fetching sudos...</code>"
+  list_result: "<b>Total sudos:</b> <code>%d</code>\n\n%s"
+  list_entry: "<b>▸</b> <a href='tg://user?id=%d'>%s</a>\n"
+  fetch_error: "<code>Error fetching sudos</code>"
+  usage_add: "<code>Usage: .addsudo &lt;user_id&gt; or reply to a user</code>"
+  usage_del: "<code>Usage: .delsudo &lt;user_id&gt; or reply to a user</code>"
+
+gban:
+  banning: "<code>Globally banning user...</code>"
+  banned: "<b>Globally banned <a href='tg://user?id=%d'>%s</a></b>\n<b>Reason:</b> %s\n<b>Success:</b> %d"
+  already_banned: "<b>User <a href='tg://user?id=%d'>%s</a> is already globally banned\nReason:</b> %s\n<b>Time:</b> %s"
+  ban_error: "<code>Error globally banning user</code>"
+  unbanning: "<code>Unglobally banning user...</code>"
+  unbanned: "<b>Unglobally banned <a href='tg://user?id=%d'>%s</a></b>\n<b>Success:</b> %d"
+  not_banned: "<b>User <a href='tg://user?id=%d'>%s</a> is not globally banned</b>"
+  unban_error: "<code>Error removing global ban</code>"
+  cant_ban_self: "<code>Can't globally ban myself</code>"
+  fetching: "<code>Fetching globally banned users...</code>"
+  list_header: "<b>Globally banned users:</b>\n"
+  list_entry: "<b>▸</b> <code>%d</code> <b>Reason:</b> %s\n\n"
+  list_empty: "<b>No users are globally banned</b>"
+  log_banned: "<b>#Globally Banned</b>\n<b>User:</b> <a href='tg://user?id=%d'>%s</a>\n<b>Reason:</b> %s"
+  log_unbanned: "<b>#Globally Unbanned</b>\n<b>User:</b> <a href='tg://user?id=%d'>%s</a>"
+  antispam_on: "<b>Antispam is enabled</b>"
+  antispam_off: "<b>Antispam is disabled</b>"
+  antispam_enabled: "Antispam has been enabled."
+  antispam_disabled: "Antispam has been disabled."
+  antispam_usage: "Usage: .antispam <enable|disable>"
+  usage_gban: "<code>Usage: .gban &lt;user_id&gt; or reply to a user</code>"
+  usage_ungban: "<code>Usage: .ungban &lt;user_id&gt; or reply to a user</code>"
+
+pm_permit:
+  approved: "User <a href='tg://user?id=%d'>%s</a> approved to pm."
+  already_approved: "User <a href='tg://user?id=%d'>%s</a> is already approved to pm."
+  disapproved: "User <a href='tg://user?id=%d'>%s</a> disapproved."
+  not_approved: "User <a href='tg://user?id=%d'>%s</a> is not approved."
+  invalid_user: "Invalid user ID."
+  approve_error: "Error approving user."
+  disapprove_error: "Error disapproving user."
+  fetching: "<code>Fetching approved users...</code>"
+  list_header: "<b>Approved users:</b>\n"
+  list_entry: "<a href='tg://user?id=%d'>%s</a>\n"
+  fetch_error: "Error fetching approved users."
+  message_limit: "You've reached your message limit. You will be temporarily blocked from messaging %s."
+
+tag_logger:
+  set_success: "<b>Tag logger set successfully:</b>\n<b>Chat ID:</b> <code>%s</code>"
+  get_result: "<b>Tag logger:</b> <code>%s</code>"
+  not_set: "<code>Tag logger not set</code>"
+  deleted: "<b>Tag logger deleted successfully</b>"
+  not_found: "<code>Tag logger not found</code>"
+  set_error: "<code>Error setting tag logger</code>"
+  send_error: "<code>Error sending message to the chat</code>"
+  invalid_chat: "<code>Invalid chat id</code>"
+  assistant_not_in_chat: "<code>Assistant is not in the chat</code>"
+  usage: "<code>Usage: .taglogger &lt;chat_id&gt;</code>"
+  notification: "<b>Yᴏᴜ Hᴀᴠᴇ Bᴇᴇɴ Tᴀɢɢᴇᴅ:</b>\n\n<b>Cʜᴀᴛ Tɪᴛʟᴇ:</b> <code>%s</code>\n<b>Tᴀɢɢᴇᴅ Bʏ:</b> <code>%s</code>\n<b>Mᴇꜱꜱᴀɢᴇ:</b> <code>%s</code>"
+  no_text: "No Text or Might be a media"
+
+userinfo:
+  fetching_stats: "<code>Fetching Stats...This may take a while</code>"
+  fetching_info: "<code>Fetching user info...</code>"
+  info_header: "<b>Fᴇᴛᴄʜᴇᴅ Iɴғᴏ:</b>\n"
+  first_name: "<b>Fɪʀsᴛ Nᴀᴍᴇ:</b> %s\n"
+  last_name: "<b>Lᴀsᴛ Nᴀᴍᴇ:</b> %s\n"
+  user_id: "<b>Usᴇʀ Iᴅ:</b> <code>%d</code>\n"
+  username: "<b>Usᴇʀɴᴀᴍᴇ:</b> @%s\n"
+  about: "<b>Aʙᴏᴜᴛ:</b> <code>%s</code>\n"
+  usernames: "<b>Usᴇʀɴᴀᴍᴇs:</b> [<code>%s</code>]\n"
+  birthday: "\n<b>Bɪʀᴛʜᴅᴀʏ:</b> %s\n"
+  user_link: "<b>Usᴇʀ Lɪɴᴋ:</b> <a href='tg://user?id=%d'>Lɪɴᴋ</a>\n"
+  dc_id: "<b>Dᴄ Iᴅ:</b> <code>%d</code>\n"
+  is_bot: "<b>Is Bᴏᴛ:</b> <code>%t</code>\n"
+  is_deleted: "<b>Is Dᴇʟᴇᴛᴇᴅ:</b> <code>%t</code>\n"
+  is_contact: "<b>Is Cᴏɴᴛᴀᴄᴛ:</b> <code>%t</code>\n"
+  is_mutual: "<b>Is Mᴜᴛᴜᴀʟ Cᴏɴᴛᴀᴄᴛ:</b> <code>%t</code>\n"
+  is_premium: "<b>Is Pʀᴇᴍɪᴜᴍ:</b> <code>%t</code>\n"
+  chat_title: "<b>Cʜᴀᴛ Tɪᴛʟᴇ:</b> %s\n"
+  chat_id: "<b>Cʜᴀᴛ Iᴅ:</b> <code>%d</code>\n"
+  chat_username: "<b>Cʜᴀᴛ Usᴇʀɴᴀᴍᴇ:</b> @%s\n"
+  participants: "<b>Pᴀʀᴛɪᴄɪᴘᴀɴᴛs Cᴏᴜɴᴛ:</b> %d\n"
+  admins_count: "<b>Aᴅᴍɪɴs Cᴏᴜɴᴛ:</b> %d\n"
+  unknown_peer: "<code>Unknown Peer Type</code>"
+  usage_info: "<code>Usage: .info &lt;user_id&gt; or reply to a user</code>"
+  id_user: "<b><a href='tg://user?id=%d'>User ID</a></b>: <code>%d</code>\n"
+  id_chat: "<b><a href='%s'>Chat ID</a></b>: <code>%d</code>\n"
+  id_message: "<b><a href='%s'>Message ID</a></b>: <code>%d</code>\n"
+  id_reply: "<b><a href='%s'>Replied Message ID</a></b>: <code>%d</code>\n"
+  id_file: "<b><a href='%s'>Replied File ID</a></b>: <code>%s</code>\n"
+  stats: |
+    <b> ‹Usᴇʀ Sᴛᴀᴛs›</b>
+
+    <b>👤 Usᴇʀs:</b> %d
+    <b>🤖 Bᴏᴛs:</b> %d
+    <b>👥 Gʀᴏᴜᴘs:</b> %d
+    <b>📡 Cʜᴀɴɴᴇʟs:</b> %d
+    <b>📞 Cᴏɴᴛᴀᴄᴛs:</b> %d
+    <b>🔒 Bʟᴏᴄᴋᴇᴅ:</b> %d
+    <b>📌 Pɪɴɴᴇᴅ:</b> %d
+    <b>📩 Uɴʀᴇᴀᴅ Mᴇssᴀɢᴇs:</b> %d
+    <b>🔔 Nᴏᴛɪғɪᴄᴀᴛɪᴏɴs:</b> %d
+    <b>📢 Mᴇɴᴛɪᴏɴs:</b> %d
+    <b>👍 Rᴇᴀᴄᴛɪᴏɴs:</b> %d
+
+    <b> ‹Cʜᴀᴛ Sᴛᴀᴛs›</b>
+
+    <b>👑 Cʀᴇᴀᴛᴏʀs:</b> %d
+    <b>🛡️ Aᴅᴍɪɴs ɪɴ Gʀᴏᴜᴘs:</b> %d
+    <b>🛡️ Aᴅᴍɪɴs ɪɴ Cʜᴀɴɴᴇʟs:</b> %d
+    <b>🔇 Dᴇʟᴇᴛᴇᴅ Usᴇʀs:</b> %d
+    <b>🤝 Mᴜᴛᴜᴀʟ Cᴏɴᴛᴀᴄᴛs:</b> %d
+
+    <b> ‹Oᴛʜᴇʀ Sᴛᴀᴛs›</b>
+
+    <b>📈 Tᴏᴛᴀʟ Dɪᴀʟᴏɢs:</b> %d
+    <b>🚫 Bʟᴏᴄᴋᴇᴅ Cᴏɴᴛᴀᴄᴛs:</b> %d
+  no_photos: "<code>No profile photos found.</code>"
+  photos_deleted: "<code>Deleted all profile photos.</code>"
+  groups_fetching: "<code>Fetching owned groups...</code>"
+  groups_header: "<b>Owned Groups:</b>\n"
+  groups_entry: "<b>%s</b> | <code>%d</code>\n"
+  groups_none: "<code>No owned groups found.</code>"
+  channels_fetching: "<code>Fetching owned channels...</code>"
+  channels_header: "<b>Owned Channels:</b>\n"
+  channels_entry: "<b>%s</b> | <code>%d</code>\n"
+  channels_none: "<code>No owned channels found.</code>"
+  leftchats_fetching: "<code>Fetching left chats...</code>"
+  leftchats_header: "<b>Left Chats:</b>\n"
+  leftchats_none: "<code>No left chats found.</code>"
+  photos_error: "<code>Error deleting photos: %v</code>"
+
+help:
+  menu_title: "<b>Aᴠᴀɪʟᴀʙʟᴇ Hᴇʟᴘ Mᴏᴅᴜʟᴇs:</b>"
+  not_allowed_title: "Not Allowed"
+  not_allowed_desc: "You are not allowed to use this bot"
+  commands_header: "Here are the commands for <b>%s</b>:\n\n"
+  command_entry: "<code>.%s</code> - %s\n"
+  fetch_error: "<code>Couldn't fetch help menu</code>"
+
+dev:
+  running: "<code>Running...</code>"
+  shell_result: "<b>CMD:</b> <pre lang='shell'>%s</pre>\n<b>OUTPUT:</b> <pre lang='shell'>%s</pre>"
+  shell_no_output: "<b>CMD:</b> <pre lang='bash'>%s</pre>\n<b>OUTPUT:</b> <pre lang='bash'>No Output</pre>"
+  shell_error: "<b>CMD:</b> <pre lang='shell'>%s</pre>\n<b>ERROR:</b> <pre lang='shell'>%s</pre>"
+  eval_result: "<b>Eval Code:</b> <pre lang='go'>%s</pre>\n<b>Output:</b> <pre lang='go'>%s</pre>"
+  no_command: "No command provided"
+  no_code: "<code>No code provided</code>"
+  error: "<b>ERROR:</b> <pre lang='go'>%s</pre>"
+
+misc:
+  downloading: "Downloading media..."
+  uploading: "Uploading media..."
+  upload_success: "Successfully uploaded media.\nLink: %s"
+  reply_to_media: "Reply to a media message to generate a link."
+  no_media: "The replied message does not contain any media."
+  error_fetching_reply: "An error occurred while fetching the reply message."
+  error_downloading: "An error occurred while downloading the media."
+
+chatbot:
+  fetching: "<code>Fetching Response...</code>"
+  result: "**Query:** `%s`\n\n**Response:**\n%s"
+  no_query: "<code>No Query Provided</code>"
+  error: "<code>Error Fetching Data</code>"
+
+lang_settings:
+  changed: "<b>Language set to:</b> %s (<code>%s</code>)"
+  current: "<b>Current Language:</b> %s (<code>%s</code>)"
+  not_found: "<code>Language '%s' not available. Use .setlang to see available languages.</code>"
+  set_error: "<code>Error setting language</code>"
+  available_header: "<b>Available Languages:</b>\n\n"
+  available_entry: "▸ <code>%s</code> - %s\n"
+  usage: "\n<b>Usage:</b> <code>.setlang &lt;code&gt;</code>"
+
+updater:
+  checking: "<code>Checking for updates...</code>"
+  up_to_date: "<b>Already up to date!</b>"
+  updates_available: "<b>Updates available!</b>\nUse <code>.update force</code> to apply."
+  updating: "<code>Updating and restarting...</code>"
+  update_error: "<code>Update failed: %s</code>"
+
+plugins:
+  install_usage: "<code>Usage: .install &lt;url&gt; - URL to a raw .go plugin file</code>"
+  install_progress: "<code>Installing plugin...</code>"
+  install_fetch_error: "<code>Failed to download plugin: %s</code>"
+  install_invalid: "<code>Invalid plugin: must be in package modules and have an init() function</code>"
+  install_write_error: "<code>Failed to save plugin: %s</code>"
+  install_build_error: "<code>Build failed: %s</code>"
+  install_success: "<b>Plugin installed:</b> <code>%s</code>\n<b>Restarting to apply...</b>"
+  uninstall_usage: "<code>Usage: .uninstall &lt;name&gt;</code>"
+  uninstall_not_found: "<code>Plugin not found: %s</code>"
+  uninstall_error: "<code>Failed to remove plugin: %s</code>"
+  uninstall_success: "<b>Plugin removed:</b> <code>%s</code>\n<b>Restarting to apply...</b>"
+  list_header: "<b>Installed Plugins:</b>\n"
+  list_entry: "<b>▸</b> <code>%s</code>\n"
+  list_none: "<b>No plugins installed</b>"
