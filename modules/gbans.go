@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/amarnathcjd/gogram/telegram"
+	"github.com/go-redis/redis/v8"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,30 +36,52 @@ func gbanUser(m *telegram.NewMessage) error {
 		reason = locales.Tr("common.no_reason")
 	}
 
-	currentBansJson, _ := Db.Get(context.Background(), "GBANS").Result()
-	banMap := make(map[int64]BanInfo)
-	if currentBansJson != "" {
-		json.Unmarshal([]byte(currentBansJson), &banMap)
+	ctx := context.Background()
+	var alreadyBanned bool
+	var existingInfo BanInfo
+
+	err := Db.Watch(ctx, func(tx *redis.Tx) error {
+		bansJson, _ := tx.Get(ctx, "GBANS").Result()
+		banMap := make(map[int64]BanInfo)
+		if bansJson != "" {
+			if err := json.Unmarshal([]byte(bansJson), &banMap); err != nil {
+				return err
+			}
+		}
+
+		if info, exists := banMap[userID]; exists {
+			alreadyBanned = true
+			existingInfo = info
+			return nil
+		}
+
+		banMap[userID] = BanInfo{
+			Reason: reason,
+			Time:   time.Now().Format(time.RFC1123),
+		}
+
+		updated, err := json.Marshal(banMap)
+		if err != nil {
+			return err
+		}
+		_, err = tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+			pipe.Set(ctx, "GBANS", updated, 0)
+			return nil
+		})
+		return err
+	}, "GBANS")
+
+	if err != nil {
+		_, err := eOR(m, locales.Tr("gban.ban_error"))
+		return err
 	}
 
-	if banInfo, exists := banMap[userID]; exists {
-		_, err := eOR(m, locales.Trf("gban.already_banned", userID, Name, banInfo.Reason, banInfo.Time))
+	if alreadyBanned {
+		_, err := eOR(m, locales.Trf("gban.already_banned", userID, Name, existingInfo.Reason, existingInfo.Time))
 		return err
 	}
 
 	msg, _ := eOR(m, locales.Tr("gban.banning"))
-
-	banMap[userID] = BanInfo{
-		Reason: reason,
-		Time:   time.Now().Format(time.RFC1123),
-	}
-
-	updatedBansJson, _ := json.Marshal(banMap)
-	err := Db.Set(context.Background(), "GBANS", updatedBansJson, 0).Err()
-	if err != nil {
-		_, err := msg.Edit(locales.Tr("gban.ban_error"))
-		return err
-	}
 
 	chats := m.Client.Cache.InputPeers.InputChannels
 	var success int
@@ -83,27 +106,47 @@ func ungbanUser(m *telegram.NewMessage) error {
 		return err
 	}
 
-	currentBansJson, _ := Db.Get(context.Background(), "GBANS").Result()
-	banMap := make(map[int64]BanInfo)
-	if currentBansJson != "" {
-		json.Unmarshal([]byte(currentBansJson), &banMap)
+	ctx := context.Background()
+	var notBanned bool
+
+	err := Db.Watch(ctx, func(tx *redis.Tx) error {
+		bansJson, _ := tx.Get(ctx, "GBANS").Result()
+		banMap := make(map[int64]BanInfo)
+		if bansJson != "" {
+			if err := json.Unmarshal([]byte(bansJson), &banMap); err != nil {
+				return err
+			}
+		}
+
+		if _, exists := banMap[userID]; !exists {
+			notBanned = true
+			return nil
+		}
+
+		delete(banMap, userID)
+
+		updated, err := json.Marshal(banMap)
+		if err != nil {
+			return err
+		}
+		_, err = tx.TxPipelined(ctx, func(pipe redis.Pipeliner) error {
+			pipe.Set(ctx, "GBANS", updated, 0)
+			return nil
+		})
+		return err
+	}, "GBANS")
+
+	if err != nil {
+		_, err := eOR(m, locales.Tr("gban.unban_error"))
+		return err
 	}
 
-	if _, exists := banMap[userID]; !exists {
+	if notBanned {
 		_, err := eOR(m, locales.Trf("gban.not_banned", userID, Name))
 		return err
 	}
 
 	msg, _ := eOR(m, locales.Tr("gban.unbanning"))
-
-	delete(banMap, userID)
-
-	updatedBansJson, _ := json.Marshal(banMap)
-	err := Db.Set(context.Background(), "GBANS", updatedBansJson, 0).Err()
-	if err != nil {
-		_, err := msg.Edit(locales.Tr("gban.unban_error"))
-		return err
-	}
 
 	chats := m.Client.Cache.InputPeers.InputChannels
 	var success int
@@ -129,14 +172,19 @@ func gbanned(m *telegram.NewMessage) error {
 	}
 
 	banMap := make(map[int64]BanInfo)
-	json.Unmarshal([]byte(currentBansJson), &banMap)
+	if err := json.Unmarshal([]byte(currentBansJson), &banMap); err != nil {
+		log.Error("Error unmarshaling GBANS:", err)
+		_, err := eOR(m, locales.Tr("gban.list_empty"))
+		return err
+	}
 
 	msg, _ := eOR(m, locales.Tr("gban.fetching"))
-	response := locales.Tr("gban.list_header")
+	var sb strings.Builder
+	sb.WriteString(locales.Tr("gban.list_header"))
 	for userID, banInfo := range banMap {
-		response += fmt.Sprintf(locales.Tr("gban.list_entry"), userID, banInfo.Reason)
+		sb.WriteString(fmt.Sprintf(locales.Tr("gban.list_entry"), userID, banInfo.Reason))
 	}
-	_, err = msg.Edit(response)
+	_, err = msg.Edit(sb.String())
 	return err
 }
 

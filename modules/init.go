@@ -70,12 +70,14 @@ func loadSudoers() {
 		log.Warnf("Could not load sudoers: %v", err)
 		return
 	}
+	var ids []int64
 	for _, s := range sudos {
 		id, err := strconv.ParseInt(s, 10, 64)
 		if err != nil {
 			continue
 		}
-		sudoers = append(sudoers, id)
+		ids = append(ids, id)
 	}
-	log.Printf("Loaded %d sudoers", len(sudoers))
+	SetSudoers(ids)
+	log.Printf("Loaded %d sudoers", len(ids))
 }

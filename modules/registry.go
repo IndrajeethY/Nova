@@ -1,6 +1,8 @@
 package modules
 
 import (
+	"slices"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -23,13 +25,9 @@ func RegisterModule(name string, load func(), priority ...int) {
 func loadAllModules() {
 	sorted := make([]ModuleEntry, len(moduleRegistry))
 	copy(sorted, moduleRegistry)
-	for i := 0; i < len(sorted); i++ {
-		for j := i + 1; j < len(sorted); j++ {
-			if sorted[j].Priority < sorted[i].Priority {
-				sorted[i], sorted[j] = sorted[j], sorted[i]
-			}
-		}
-	}
+	slices.SortFunc(sorted, func(a, b ModuleEntry) int {
+		return a.Priority - b.Priority
+	})
 	for _, mod := range sorted {
 		log.Printf("Loading module: %s", mod.Name)
 		mod.Load()

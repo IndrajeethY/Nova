@@ -29,7 +29,6 @@ func compressImage(imagePath string) ([]byte, error) {
 		return nil, fmt.Errorf("error opening image file: %w", err)
 	}
 	defer file.Close()
-	defer os.Remove(imagePath)
 	img, _, err := image.Decode(file)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding image: %w", err)
@@ -47,7 +46,8 @@ func compressImage(imagePath string) ([]byte, error) {
 }
 
 func ProcessGemini(imagePath, text string) (string, error) {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	key := db.RDb.Get(ctx, "GEMINI_API_KEY").Val()
 	if key == "" {
 		return "", fmt.Errorf("GEMINI_API_KEY is not set")
@@ -67,7 +67,7 @@ func ProcessGemini(imagePath, text string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		parts = append(parts, genai.NewPartFromBytes(compressedImage, "image/png"))
+		parts = append(parts, genai.NewPartFromBytes(compressedImage, "image/jpeg"))
 	}
 	parts = append(parts, genai.NewPartFromText(text))
 
@@ -136,7 +136,9 @@ func RemoveFrom64Array(arr []int64, val int64) []int64 {
 }
 
 func GetRandom(s []string) string {
-	rand.New(rand.NewSource(time.Now().UnixNano()))
+	if len(s) == 0 {
+		return ""
+	}
 	return s[rand.Intn(len(s))]
 }
 
@@ -177,7 +179,7 @@ func UploadFileToEnvsSh(filePath string) (string, error) {
 	}
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
-	client := &http.Client{}
+	client := &http.Client{Timeout: 30 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", err

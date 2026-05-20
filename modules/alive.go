@@ -20,7 +20,7 @@ func Alive(m *telegram.NewMessage) error {
 
 	message := locales.Trf("alive.message",
 		client.Me().FirstName+" "+client.Me().LastName, client.Me().ID,
-		len(sudoers), goVersion, gogramVersion, uptime,
+		GetSudoersCount(), goVersion, gogramVersion, uptime,
 	)
 	aliveimage, err := Db.Get(context.Background(), "ALIVE_IMAGE").Result()
 	if err == nil {

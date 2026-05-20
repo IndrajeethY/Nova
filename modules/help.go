@@ -2,7 +2,6 @@ package modules
 
 import (
 	"NovaUserbot/locales"
-	"NovaUserbot/utils"
 	"fmt"
 	"sort"
 	"strconv"
@@ -25,6 +24,8 @@ var HelpMap = map[string][]Handler{}
 var ModuleList []string
 
 func LoadModulesOrder() {
+	helpMu.RLock()
+	defer helpMu.RUnlock()
 	ModuleList = nil
 	for mod := range HelpMap {
 		ModuleList = append(ModuleList, mod)
@@ -34,7 +35,7 @@ func LoadModulesOrder() {
 
 func HelpInline(i *telegram.InlineQuery) error {
 	b := i.Builder()
-	if !utils.IsIn64Array(sudoers, i.Sender.ID) && i.Sender.ID != ubId {
+	if !IsSudoer(i.Sender.ID) && i.Sender.ID != ubId {
 		btn := telegram.ButtonBuilder{}
 		b.Article(locales.Tr("help.not_allowed_title"), locales.Tr("help.not_allowed_desc"), locales.Tr("help.not_allowed_desc"),
 			&telegram.ArticleOptions{ReplyMarkup: telegram.NewKeyboard().NewRow(1, btn.URL("Owner", "t.me/tamilvip007")).Build()})
@@ -68,11 +69,19 @@ func PaginateHelp(index int) *telegram.ReplyInlineMarkup {
 }
 
 func HelpCmd(m *telegram.NewMessage) error {
-	results, _ := m.Client.InlineQuery(tbotId, &telegram.InlineOptions{Query: "help"})
-	res := results.Results[0].(*telegram.BotInlineResultObj)
+	results, err := m.Client.InlineQuery(tbotId, &telegram.InlineOptions{Query: "help"})
+	if err != nil || results == nil || len(results.Results) == 0 {
+		eOR(m, locales.Tr("help.fetch_error"))
+		return err
+	}
+	res, ok := results.Results[0].(*telegram.BotInlineResultObj)
+	if !ok {
+		eOR(m, locales.Tr("help.fetch_error"))
+		return nil
+	}
 	defer m.Delete()
 	chat, _ := m.Client.GetSendablePeer(m.ChatID())
-	_, err := m.Client.MessagesSendInlineBotResult(&telegram.MessagesSendInlineBotResultParams{
+	_, err = m.Client.MessagesSendInlineBotResult(&telegram.MessagesSendInlineBotResultParams{
 		QueryID: results.QueryID, Peer: chat, RandomID: results.QueryID, ID: res.ID,
 	})
 	if err != nil {
@@ -85,14 +94,17 @@ func HelpCmd(m *telegram.NewMessage) error {
 
 func HelpCbk(cb *telegram.InlineCallbackQuery) error {
 	data := string(cb.Data)
-	if !utils.IsIn64Array(sudoers, cb.Sender.ID) && cb.Sender.ID != ubId {
+	if !IsSudoer(cb.Sender.ID) && cb.Sender.ID != ubId {
 		cb.Client.AnswerCallbackQuery(cb.QueryID, locales.Tr("help.not_allowed_desc"), &telegram.CallbackOptions{Alert: true})
 		return nil
 	}
 	if strings.Contains(data, "help:") {
 		parts := strings.Split(data, ":")
+		if len(parts) < 3 {
+			return nil
+		}
 		module := strings.ReplaceAll(parts[1], "_", " ")
-		handlers, exists := HelpMap[module]
+		handlers, exists := GetHelpModule(module)
 		if !exists {
 			return fmt.Errorf("module not found in HelpMap")
 		}
@@ -109,6 +121,9 @@ func HelpCbk(cb *telegram.InlineCallbackQuery) error {
 	}
 	if strings.Contains(data, "help_page_") {
 		parts := strings.Split(data, "_")
+		if len(parts) < 3 {
+			return nil
+		}
 		index, _ := strconv.Atoi(parts[2])
 		cb.Edit(locales.Tr("help.menu_title"), &telegram.SendOptions{ReplyMarkup: PaginateHelp(index), ParseMode: "html"})
 		return nil

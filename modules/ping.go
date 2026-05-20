@@ -59,7 +59,11 @@ func DCPingHandler(m *telegram.NewMessage) error {
 }
 
 func PingHandler(m *telegram.NewMessage) error {
-	msgTime := m.OriginalUpdate.(*telegram.MessageObj).Date
+	msgObj, ok := m.OriginalUpdate.(*telegram.MessageObj)
+	if !ok {
+		return nil
+	}
+	msgTime := msgObj.Date
 	duration := time.Since(time.Unix(int64(msgTime), 0))
 	msg, err := eOR(m, locales.Tr("ping.pinging"))
 	if err != nil {

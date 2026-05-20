@@ -66,16 +66,17 @@ func ListKeys(m *telegram.NewMessage) error {
 		_, err = eOR(m, locales.Tr("database.fetch_error"))
 		return err
 	}
-	var formatted []string
+	var b strings.Builder
 	for _, key := range keys {
-		formatted = append(formatted, fmt.Sprintf(locales.Tr("database.list_entry"), key))
+		fmt.Fprintf(&b, locales.Tr("database.list_entry"), key)
+		b.WriteString("\n")
 	}
-	_, err = eOR(m, locales.Trf("database.list_header", len(keys), strings.Join(formatted, "\n")), &telegram.SendOptions{ParseMode: "HTML"})
+	_, err = eOR(m, locales.Trf("database.list_header", len(keys), b.String()), &telegram.SendOptions{ParseMode: "HTML"})
 	return err
 }
 
 func DelAllKeys(m *telegram.NewMessage) error {
-	err := Db.FlushAll(context.Background()).Err()
+	err := Db.FlushDB(context.Background()).Err()
 	if err != nil {
 		_, err = eOR(m, locales.Tr("database.del_all_error"))
 		return err

@@ -32,13 +32,18 @@ func OnChatBotMessage(m *telegram.NewMessage) error {
 		log.Error("Error downloading media:", err)
 		return err
 	}
+	defer os.Remove(file)
 	result, err := utils.ProcessGemini(file, chatbotPrompt)
 	if err != nil {
 		log.Error("Error processing image:", err)
 		return err
 	}
 	if m.Message.ReplyMarkup != nil {
-		for _, row := range m.Message.ReplyMarkup.(*telegram.ReplyInlineMarkup).Rows {
+		markup, ok := m.Message.ReplyMarkup.(*telegram.ReplyInlineMarkup)
+		if !ok {
+			return nil
+		}
+		for _, row := range markup.Rows {
 			for _, btns := range row.Buttons {
 				btn, ok := btns.(*telegram.KeyboardButtonCallback)
 				if !ok {

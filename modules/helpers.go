@@ -11,6 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var extractUserRe = regexp.MustCompile(`^(?:(\d+)|@(\w+)|https://t.me/(\w+)|tg://user\?id=(\d+))`)
+
 func IsAdmin(user int64, chat int64) bool {
 	perms, err := client.GetChatMember(chat, user)
 	if err != nil {
@@ -26,9 +28,8 @@ func msgLink(m *telegram.NewMessage) string {
 	}
 	if m.Channel.Username != "" {
 		return fmt.Sprintf("https://t.me/%s/%d", m.Channel.Username, m.ID)
-	} else {
-		return fmt.Sprintf("https://t.me/c/%d/%d", m.ChatID(), m.ID)
 	}
+	return fmt.Sprintf("https://t.me/c/%d/%d", m.ChatID(), m.ID)
 }
 
 func eOR(m *telegram.NewMessage, text string, opts ...*telegram.SendOptions) (*telegram.NewMessage, error) {
@@ -50,8 +51,7 @@ func ExtractUserMsg(m *telegram.NewMessage) (int64, string, string) {
 		userId = replied.Sender.ID
 		userName = replied.Sender.FirstName + " " + replied.Sender.LastName
 	} else {
-		re := regexp.MustCompile(`^(\d+)|@(\w+)|https://t.me/(\w+)|tg://user\?id=(\d+)`)
-		matches := re.FindStringSubmatch(msg)
+		matches := extractUserRe.FindStringSubmatch(msg)
 		if len(matches) > 0 {
 			splited := strings.Split(msg, " ")
 			if matches[1] != "" {

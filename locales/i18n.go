@@ -17,7 +17,7 @@ var localeFiles embed.FS
 
 type Translations struct {
 	mu          sync.RWMutex
-	languages   map[string]map[string]interface{}
+	languages   map[string]map[string]any
 	defaultLang string
 	db          *redis.Client
 }
@@ -30,7 +30,7 @@ var (
 func GetInstance() *Translations {
 	once.Do(func() {
 		instance = &Translations{
-			languages:   make(map[string]map[string]interface{}),
+			languages:   make(map[string]map[string]any),
 			defaultLang: "en",
 		}
 	})
@@ -71,7 +71,7 @@ func (t *Translations) loadLanguageFile(filename string) error {
 		return fmt.Errorf("failed to read file: %w", err)
 	}
 
-	var langData map[string]interface{}
+	var langData map[string]any
 	if err := yaml.Unmarshal(data, &langData); err != nil {
 		return fmt.Errorf("failed to parse YAML: %w", err)
 	}
@@ -88,7 +88,10 @@ func (t *Translations) loadLanguageFile(filename string) error {
 func (t *Translations) Get(lang, key string) string {
 	t.mu.RLock()
 	defer t.mu.RUnlock()
+	return t.getLocked(lang, key)
+}
 
+func (t *Translations) getLocked(lang, key string) string {
 	langData, exists := t.languages[lang]
 	if !exists {
 		langData = t.languages[t.defaultLang]
@@ -98,15 +101,15 @@ func (t *Translations) Get(lang, key string) string {
 	}
 
 	parts := strings.Split(key, ".")
-	var current interface{} = langData
+	var current any = langData
 
 	for _, part := range parts {
 		switch v := current.(type) {
-		case map[string]interface{}:
+		case map[string]any:
 			current = v[part]
 		default:
 			if lang != t.defaultLang {
-				return t.Get(t.defaultLang, key)
+				return t.getLocked(t.defaultLang, key)
 			}
 			return key
 		}
@@ -117,9 +120,15 @@ func (t *Translations) Get(lang, key string) string {
 	}
 
 	if lang != t.defaultLang {
-		return t.Get(t.defaultLang, key)
+		return t.getLocked(t.defaultLang, key)
 	}
 	return key
+}
+
+func (t *Translations) getDefaultLang() string {
+	t.mu.RLock()
+	defer t.mu.RUnlock()
+	return t.defaultLang
 }
 
 func (t *Translations) SetGlobalLanguage(lang string) error {
@@ -133,7 +142,8 @@ func (t *Translations) SetGlobalLanguage(lang string) error {
 }
 
 func Tr(key string) string {
-	return GetInstance().Get(GetInstance().defaultLang, key)
+	t := GetInstance()
+	return t.Get(t.getDefaultLang(), key)
 }
 
 func Trf(key string, args ...any) string {

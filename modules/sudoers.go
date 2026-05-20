@@ -2,9 +2,9 @@ package modules
 
 import (
 	"NovaUserbot/locales"
-	"NovaUserbot/utils"
 	"context"
 	"fmt"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 
@@ -22,7 +22,7 @@ func AddSudo(m *telegram.NewMessage) error {
 		return err
 	}
 	msg, _ := eOR(m, locales.Tr("sudo.adding"))
-	if utils.IsIn64Array(sudoers, userId) {
+	if IsSudoer(userId) {
 		_, err := msg.Edit(locales.Tr("sudo.already_sudo"))
 		return err
 	}
@@ -31,7 +31,7 @@ func AddSudo(m *telegram.NewMessage) error {
 		_, err := msg.Edit(locales.Tr("sudo.add_error"))
 		return err
 	}
-	sudoers = append(sudoers, userId)
+	AddSudoer(userId)
 	_, err = msg.Edit(locales.Trf("sudo.added", userId, userName))
 	return err
 }
@@ -43,7 +43,7 @@ func DelSudo(m *telegram.NewMessage) error {
 		return err
 	}
 	msg, _ := eOR(m, locales.Tr("sudo.deleting"))
-	if !utils.IsIn64Array(sudoers, userId) {
+	if !IsSudoer(userId) {
 		_, err := msg.Edit(locales.Tr("sudo.not_sudo"))
 		return err
 	}
@@ -53,7 +53,7 @@ func DelSudo(m *telegram.NewMessage) error {
 		_, err := msg.Edit(locales.Tr("sudo.del_error"))
 		return err
 	}
-	sudoers = utils.RemoveFrom64Array(sudoers, userId)
+	RemoveSudoer(userId)
 	_, err = msg.Edit(locales.Trf("sudo.deleted", userId, userName))
 	return err
 }
@@ -65,12 +65,12 @@ func ListSudo(m *telegram.NewMessage) error {
 		return err
 	}
 	msg, _ := eOR(m, locales.Tr("sudo.fetching"))
-	var formatted string
+	var b strings.Builder
 	for _, sudo := range sudos {
 		userId, userName := GetUserInfo(sudo)
-		formatted += fmt.Sprintf(locales.Tr("sudo.list_entry"), userId, userName)
+		fmt.Fprintf(&b, locales.Tr("sudo.list_entry"), userId, userName)
 	}
-	_, err = msg.Edit(locales.Trf("sudo.list_result", len(sudos), formatted), &telegram.SendOptions{ParseMode: "HTML"})
+	_, err = msg.Edit(locales.Trf("sudo.list_result", len(sudos), b.String()), &telegram.SendOptions{ParseMode: "HTML"})
 	return err
 }
 

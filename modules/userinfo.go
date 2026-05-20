@@ -4,6 +4,7 @@ import (
 	"NovaUserbot/locales"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/amarnathcjd/gogram/telegram"
@@ -18,6 +19,9 @@ func parseBirthday(dat, month, year int32) string {
 		"January", "February", "March", "April", "May", "June",
 		"July", "August", "September", "October", "November", "December",
 	}
+	if month < 1 || month > 12 {
+		return "Invalid month"
+	}
 	result := strconv.Itoa(int(dat)) + ", " + months[month-1]
 	if year != 0 {
 		result += ", " + strconv.Itoa(int(year))
@@ -31,7 +35,7 @@ func tillDate(dat, month int32) string {
 	if timeBday.Before(time.Now()) {
 		timeBday = time.Date(currYear+1, time.Month(month), int(dat), 0, 0, 0, 0, time.UTC)
 	}
-	days := timeBday.Sub(time.Now()).Hours() / 24
+	days := time.Until(timeBday).Hours() / 24
 	return strconv.Itoa(int(days)) + " days"
 }
 
@@ -135,90 +139,118 @@ func userInfo(m *telegram.NewMessage) error {
 	}
 	msg, _ := eOR(m, locales.Tr("userinfo.fetching_info"))
 	peer, _ := client.GetSendablePeer(userId)
-	response := locales.Tr("userinfo.info_header")
+	var sb strings.Builder
+	sb.WriteString(locales.Tr("userinfo.info_header"))
 	var photo *telegram.InputMediaPhoto
 
 	switch p := peer.(type) {
 	case *telegram.InputPeerUser:
-		userinfo, _ := m.Client.UsersGetFullUser(&telegram.InputUserObj{
+		userinfo, err := m.Client.UsersGetFullUser(&telegram.InputUserObj{
 			UserID: p.UserID, AccessHash: p.AccessHash,
 		})
+		if err != nil {
+			_, err2 := msg.Edit(locales.Trf("userinfo.photos_error", err))
+			return err2
+		}
 		uf := userinfo.FullUser
-		un := userinfo.Users[0].(*telegram.UserObj)
+		un, ok := userinfo.Users[0].(*telegram.UserObj)
+		if !ok {
+			return nil
+		}
 		if un.FirstName != "" {
-			response += fmt.Sprintf(locales.Tr("userinfo.first_name"), un.FirstName)
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.first_name"), un.FirstName))
 		}
 		if un.LastName != "" {
-			response += fmt.Sprintf(locales.Tr("userinfo.last_name"), un.LastName)
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.last_name"), un.LastName))
 		}
-		response += fmt.Sprintf(locales.Tr("userinfo.user_id"), un.ID)
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.user_id"), un.ID))
 		if un.Username != "" {
-			response += fmt.Sprintf(locales.Tr("userinfo.username"), un.Username)
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.username"), un.Username))
 		}
 		if uf.About != "" {
-			response += fmt.Sprintf(locales.Tr("userinfo.about"), uf.About)
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.about"), uf.About))
 		}
 		if un.Usernames != nil {
-			var s string
+			var s strings.Builder
 			for _, v := range un.Usernames {
-				s += "@" + v.Username + " "
+				s.WriteString("@")
+				s.WriteString(v.Username)
+				s.WriteString(" ")
 			}
-			response += fmt.Sprintf(locales.Tr("userinfo.usernames"), s)
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.usernames"), s.String()))
 		}
 		if uf.Birthday != nil {
-			response += fmt.Sprintf(locales.Tr("userinfo.birthday"), parseBirthday(uf.Birthday.Day, uf.Birthday.Month, uf.Birthday.Year))
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.birthday"), parseBirthday(uf.Birthday.Day, uf.Birthday.Month, uf.Birthday.Year)))
 		}
-		response += fmt.Sprintf(locales.Tr("userinfo.user_link"), un.ID)
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.user_link"), un.ID))
 		if uf.ProfilePhoto != nil {
-			pic := uf.ProfilePhoto.(*telegram.PhotoObj)
-			response += fmt.Sprintf(locales.Tr("userinfo.dc_id"), pic.DcID)
-			if uf.PersonalPhoto != nil {
-				pic = uf.PersonalPhoto.(*telegram.PhotoObj)
-			}
-			photo = &telegram.InputMediaPhoto{
-				ID: &telegram.InputPhotoObj{
-					ID: pic.ID, AccessHash: pic.AccessHash, FileReference: pic.FileReference,
-				},
-				Spoiler: true,
+			pic, ok := uf.ProfilePhoto.(*telegram.PhotoObj)
+			if ok {
+				sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.dc_id"), pic.DcID))
+				if uf.PersonalPhoto != nil {
+					if pp, ok2 := uf.PersonalPhoto.(*telegram.PhotoObj); ok2 {
+						pic = pp
+					}
+				}
+				photo = &telegram.InputMediaPhoto{
+					ID: &telegram.InputPhotoObj{
+						ID: pic.ID, AccessHash: pic.AccessHash, FileReference: pic.FileReference,
+					},
+					Spoiler: true,
+				}
 			}
 		}
-		response += fmt.Sprintf(locales.Tr("userinfo.is_bot"), un.Bot)
-		response += fmt.Sprintf(locales.Tr("userinfo.is_deleted"), un.Deleted)
-		response += fmt.Sprintf(locales.Tr("userinfo.is_contact"), un.Contact)
-		response += fmt.Sprintf(locales.Tr("userinfo.is_mutual"), un.MutualContact)
-		response += fmt.Sprintf(locales.Tr("userinfo.is_premium"), un.Premium)
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.is_bot"), un.Bot))
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.is_deleted"), un.Deleted))
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.is_contact"), un.Contact))
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.is_mutual"), un.MutualContact))
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.is_premium"), un.Premium))
 
 	case *telegram.InputPeerChannel:
-		chatInfo, _ := m.Client.ChannelsGetFullChannel(&telegram.InputChannelObj{
+		chatInfo, err := m.Client.ChannelsGetFullChannel(&telegram.InputChannelObj{
 			ChannelID: p.ChannelID, AccessHash: p.AccessHash,
 		})
-		cf := chatInfo.FullChat.(*telegram.ChannelFull)
-		cobj := chatInfo.Chats[0].(*telegram.Channel)
-		response += fmt.Sprintf(locales.Tr("userinfo.chat_title"), cobj.Title)
-		response += fmt.Sprintf(locales.Tr("userinfo.chat_id"), cobj.ID)
+		if err != nil {
+			_, err2 := msg.Edit(locales.Trf("userinfo.photos_error", err))
+			return err2
+		}
+		cf, ok := chatInfo.FullChat.(*telegram.ChannelFull)
+		if !ok {
+			return nil
+		}
+		cobj, ok := chatInfo.Chats[0].(*telegram.Channel)
+		if !ok {
+			return nil
+		}
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.chat_title"), cobj.Title))
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.chat_id"), cobj.ID))
 		if cobj.Username != "" {
-			response += fmt.Sprintf(locales.Tr("userinfo.chat_username"), cobj.Username)
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.chat_username"), cobj.Username))
 		}
 		if cf.About != "" {
-			response += fmt.Sprintf(locales.Tr("userinfo.about"), cf.About)
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.about"), cf.About))
 		}
 		if cf.ChatPhoto != nil {
-			pic := cf.ChatPhoto.(*telegram.PhotoObj)
-			response += fmt.Sprintf(locales.Tr("userinfo.dc_id"), pic.DcID)
-			photo = &telegram.InputMediaPhoto{
-				ID: &telegram.InputPhotoObj{
-					ID: pic.ID, AccessHash: pic.AccessHash, FileReference: pic.FileReference,
-				},
-				Spoiler: true,
+			pic, ok := cf.ChatPhoto.(*telegram.PhotoObj)
+			if ok {
+				sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.dc_id"), pic.DcID))
+				photo = &telegram.InputMediaPhoto{
+					ID: &telegram.InputPhotoObj{
+						ID: pic.ID, AccessHash: pic.AccessHash, FileReference: pic.FileReference,
+					},
+					Spoiler: true,
+				}
 			}
 		}
-		response += fmt.Sprintf(locales.Tr("userinfo.participants"), cf.ParticipantsCount)
-		response += fmt.Sprintf(locales.Tr("userinfo.admins_count"), cf.AdminsCount)
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.participants"), cf.ParticipantsCount))
+		sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.admins_count"), cf.AdminsCount))
 
 	default:
-		response = locales.Tr("userinfo.unknown_peer")
+		sb.Reset()
+		sb.WriteString(locales.Tr("userinfo.unknown_peer"))
 	}
 
+	response := sb.String()
 	if photo != nil && photo.ID != nil {
 		_, err := m.Client.EditMessage(m.ChatID(), msg.ID, response, &telegram.SendOptions{Media: photo})
 		return err
@@ -260,7 +292,10 @@ func deletePfpCmd(m *telegram.NewMessage) error {
 	}
 	allPics := make([]telegram.InputPhoto, 0, len(pics))
 	for _, p := range pics {
-		data := p.Photo.(*telegram.PhotoObj)
+		data, ok := p.Photo.(*telegram.PhotoObj)
+		if !ok {
+			continue
+		}
 		allPics = append(allPics, &telegram.InputPhotoObj{
 			ID: data.ID, AccessHash: data.AccessHash, FileReference: data.FileReference,
 		})
@@ -276,7 +311,7 @@ func deletePfpCmd(m *telegram.NewMessage) error {
 
 func myGroupsCmd(m *telegram.NewMessage) error {
 	msg, _ := eOR(m, locales.Tr("userinfo.groups_fetching"))
-	var result string
+	var sb strings.Builder
 	count := 0
 	client.IterDialogs(func(d *telegram.TLDialog) error {
 		switch p := d.Peer.(type) {
@@ -285,28 +320,28 @@ func myGroupsCmd(m *telegram.NewMessage) error {
 			if err != nil || !chatInfo.Creator || chatInfo.Broadcast {
 				return nil
 			}
-			result += fmt.Sprintf(locales.Tr("userinfo.groups_entry"), chatInfo.Title, chatInfo.ID)
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.groups_entry"), chatInfo.Title, chatInfo.ID))
 			count++
 		case *telegram.PeerChat:
 			chatInfo, err := client.GetChat(p.ChatID)
 			if err != nil || !chatInfo.Creator {
 				return nil
 			}
-			result += fmt.Sprintf(locales.Tr("userinfo.groups_entry"), chatInfo.Title, chatInfo.ID)
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.groups_entry"), chatInfo.Title, chatInfo.ID))
 			count++
 		}
 		return nil
 	}, &telegram.DialogOptions{SleepThresholdMs: 10, Limit: 5000})
 	if count == 0 {
-		result = locales.Tr("userinfo.groups_none")
+		sb.WriteString(locales.Tr("userinfo.groups_none"))
 	}
-	_, err := msg.Edit(locales.Tr("userinfo.groups_header") + result)
+	_, err := msg.Edit(locales.Tr("userinfo.groups_header") + sb.String())
 	return err
 }
 
 func myChannelsCmd(m *telegram.NewMessage) error {
 	msg, _ := eOR(m, locales.Tr("userinfo.channels_fetching"))
-	var result string
+	var sb strings.Builder
 	count := 0
 	client.IterDialogs(func(d *telegram.TLDialog) error {
 		if p, ok := d.Peer.(*telegram.PeerChannel); ok {
@@ -314,18 +349,18 @@ func myChannelsCmd(m *telegram.NewMessage) error {
 			if err != nil || !chatInfo.Creator || !chatInfo.Broadcast {
 				return nil
 			}
-			result += fmt.Sprintf(locales.Tr("userinfo.channels_entry"), chatInfo.Title, chatInfo.ID)
+			sb.WriteString(fmt.Sprintf(locales.Tr("userinfo.channels_entry"), chatInfo.Title, chatInfo.ID))
 			if chatInfo.Username != "" {
-				result += fmt.Sprintf("t.me/%s\n", chatInfo.Username)
+				sb.WriteString(fmt.Sprintf("t.me/%s\n", chatInfo.Username))
 			}
 			count++
 		}
 		return nil
 	}, &telegram.DialogOptions{SleepThresholdMs: 10, Limit: 5000})
 	if count == 0 {
-		result = locales.Tr("userinfo.channels_none")
+		sb.WriteString(locales.Tr("userinfo.channels_none"))
 	}
-	_, err := msg.Edit(locales.Tr("userinfo.channels_header") + result)
+	_, err := msg.Edit(locales.Tr("userinfo.channels_header") + sb.String())
 	return err
 }
 
@@ -336,25 +371,29 @@ func leftChatsCmd(m *telegram.NewMessage) error {
 		_, err2 := msg.Edit(locales.Tr("userinfo.leftchats_none"))
 		return err2
 	}
-	var result string
-	leftChats := leftChatsObj.(*telegram.MessagesChatsObj)
+	leftChats, ok := leftChatsObj.(*telegram.MessagesChatsObj)
+	if !ok {
+		_, err2 := msg.Edit(locales.Tr("userinfo.leftchats_none"))
+		return err2
+	}
+	var sb strings.Builder
 	for _, chatObj := range leftChats.Chats {
 		switch chat := chatObj.(type) {
 		case *telegram.ChatObj:
 			if chat.Title != "" {
-				result += fmt.Sprintf("<b>%s</b> | <code>%d</code>\n", chat.Title, chat.ID)
+				sb.WriteString(fmt.Sprintf("<b>%s</b> | <code>%d</code>\n", chat.Title, chat.ID))
 			}
 		case *telegram.Channel:
 			if chat.Title != "" {
-				result += fmt.Sprintf("<b>%s</b> | <code>%d</code>\n", chat.Title, chat.ID)
+				sb.WriteString(fmt.Sprintf("<b>%s</b> | <code>%d</code>\n", chat.Title, chat.ID))
 			}
 		}
 	}
-	if result == "" {
+	if sb.Len() == 0 {
 		_, err2 := msg.Edit(locales.Tr("userinfo.leftchats_none"))
 		return err2
 	}
-	_, err2 := msg.Edit(locales.Tr("userinfo.leftchats_header") + result)
+	_, err2 := msg.Edit(locales.Tr("userinfo.leftchats_header") + sb.String())
 	return err2
 }
 

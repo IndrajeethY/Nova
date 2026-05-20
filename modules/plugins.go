@@ -14,6 +14,7 @@ import (
 	"syscall"
 
 	"github.com/amarnathcjd/gogram/telegram"
+	log "github.com/sirupsen/logrus"
 )
 
 func init() {
@@ -83,7 +84,10 @@ func installPlugin(m *telegram.NewMessage) error {
 	pluginsJson, _ := Db.Get(context.Background(), "INSTALLED_PLUGINS").Result()
 	plugins := make(map[string]string)
 	if pluginsJson != "" {
-		json.Unmarshal([]byte(pluginsJson), &plugins)
+		if err := json.Unmarshal([]byte(pluginsJson), &plugins); err != nil {
+			log.Error("Error unmarshaling INSTALLED_PLUGINS:", err)
+			plugins = make(map[string]string)
+		}
 	}
 	plugins[pluginName] = url
 	updated, _ := json.Marshal(plugins)
@@ -118,7 +122,10 @@ func uninstallPlugin(m *telegram.NewMessage) error {
 	pluginsJson, _ := Db.Get(context.Background(), "INSTALLED_PLUGINS").Result()
 	plugins := make(map[string]string)
 	if pluginsJson != "" {
-		json.Unmarshal([]byte(pluginsJson), &plugins)
+		if err := json.Unmarshal([]byte(pluginsJson), &plugins); err != nil {
+			log.Error("Error unmarshaling INSTALLED_PLUGINS:", err)
+			plugins = make(map[string]string)
+		}
 	}
 	delete(plugins, name)
 	updated, _ := json.Marshal(plugins)
@@ -133,7 +140,10 @@ func listPlugins(m *telegram.NewMessage) error {
 	pluginsJson, _ := Db.Get(context.Background(), "INSTALLED_PLUGINS").Result()
 	plugins := make(map[string]string)
 	if pluginsJson != "" {
-		json.Unmarshal([]byte(pluginsJson), &plugins)
+		if err := json.Unmarshal([]byte(pluginsJson), &plugins); err != nil {
+			log.Error("Error unmarshaling INSTALLED_PLUGINS:", err)
+			plugins = make(map[string]string)
+		}
 	}
 
 	if len(plugins) == 0 {
@@ -141,11 +151,12 @@ func listPlugins(m *telegram.NewMessage) error {
 		return err
 	}
 
-	response := locales.Tr("plugins.list_header")
+	var sb strings.Builder
+	sb.WriteString(locales.Tr("plugins.list_header"))
 	for name := range plugins {
-		response += fmt.Sprintf(locales.Tr("plugins.list_entry"), name)
+		sb.WriteString(fmt.Sprintf(locales.Tr("plugins.list_entry"), name))
 	}
-	_, err := eOR(m, response)
+	_, err := eOR(m, sb.String())
 	return err
 }
 
