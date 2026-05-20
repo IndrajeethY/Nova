@@ -16,7 +16,11 @@ import (
 	"github.com/nfnt/resize"
 )
 
-const stickerPackKey = "STICKER_PACK"
+const (
+	stickerPackKey  = "STICKER_PACK"
+	stickerPacksKey = "STICKER_PACKS"
+	maxStickers     = 120
+)
 
 func init() {
 	RegisterModule("Stickers", loadStickersModule)
@@ -29,6 +33,16 @@ func getPackShortName() string {
 
 func setPackShortName(name string) {
 	Db.Set(context.Background(), stickerPackKey, name, 0)
+	addPackToList(name)
+}
+
+func addPackToList(name string) {
+	Db.SAdd(context.Background(), stickerPacksKey, name)
+}
+
+func getAllPacks() []string {
+	packs, _ := Db.SMembers(context.Background(), stickerPacksKey).Result()
+	return packs
 }
 
 func docToInputDoc(doc *telegram.DocumentObj) *telegram.InputDocumentObj {
@@ -55,6 +69,43 @@ func isImageDoc(m *telegram.NewMessage) bool {
 	return doc != nil && strings.HasPrefix(doc.MimeType, "image/")
 }
 
+func nextPackShortName() string {
+	base := fmt.Sprintf("nova_%d", ubId)
+	for i := 1; ; i++ {
+		name := base
+		if i > 1 {
+			name = fmt.Sprintf("%s_%d", base, i)
+		}
+		_, err := client.MessagesGetStickerSet(&telegram.InputStickerSetShortName{ShortName: name}, 0)
+		if err != nil {
+			return name
+		}
+	}
+}
+
+func findAvailablePack() (string, error) {
+	packName := getPackShortName()
+	if packName == "" {
+		return "", nil
+	}
+
+	setResult, err := client.MessagesGetStickerSet(&telegram.InputStickerSetShortName{ShortName: packName}, 0)
+	if err != nil {
+		return "", nil
+	}
+
+	setObj, ok := setResult.(*telegram.MessagesStickerSetObj)
+	if !ok {
+		return "", nil
+	}
+
+	if setObj.Set.Count < maxStickers {
+		return packName, nil
+	}
+
+	return "", nil
+}
+
 func createPack(emoji string, inputDoc telegram.InputDocument) (*telegram.MessagesStickerSetObj, error) {
 	user, err := client.GetSendableUser(ubId)
 	if err != nil {
@@ -62,8 +113,19 @@ func createPack(emoji string, inputDoc telegram.InputDocument) (*telegram.Messag
 	}
 
 	me := client.Me()
-	shortName := fmt.Sprintf("nova_%d", ubId)
+	shortName := nextPackShortName()
+	num := 1
+	if strings.Contains(shortName, fmt.Sprintf("nova_%d_", ubId)) {
+		parts := strings.Split(shortName, "_")
+		if len(parts) > 2 {
+			num, _ = strconv.Atoi(parts[len(parts)-1])
+		}
+	}
+
 	title := fmt.Sprintf("%s's Nova Pack", me.FirstName)
+	if num > 1 {
+		title = fmt.Sprintf("%s's Nova Pack Vol.%d", me.FirstName, num)
+	}
 
 	result, err := client.StickersCreateStickerSet(&telegram.StickersCreateStickerSetParams{
 		UserID:    user,
@@ -81,6 +143,37 @@ func createPack(emoji string, inputDoc telegram.InputDocument) (*telegram.Messag
 	}
 	setPackShortName(sObj.Set.ShortName)
 	return sObj, nil
+}
+
+func addStickerToPackOrCreate(inputDoc telegram.InputDocument, emoji string) (string, error) {
+	packName, err := findAvailablePack()
+	if err != nil {
+		return "", err
+	}
+
+	if packName == "" {
+		result, err := createPack(emoji, inputDoc)
+		if err != nil {
+			return "", err
+		}
+		return result.Set.ShortName, nil
+	}
+
+	_, addErr := client.StickersAddStickerToSet(
+		&telegram.InputStickerSetShortName{ShortName: packName},
+		&telegram.InputStickerSetItem{Document: inputDoc, Emoji: emoji},
+	)
+	if addErr != nil {
+		if strings.Contains(addErr.Error(), "STICKERS_TOO_MUCH") || strings.Contains(addErr.Error(), "STICKERPACK_STICKERS_TOO_MUCH") {
+			result, err := createPack(emoji, inputDoc)
+			if err != nil {
+				return "", err
+			}
+			return result.Set.ShortName, nil
+		}
+		return "", addErr
+	}
+	return packName, nil
 }
 
 func uploadPhotoAsSticker(reply *telegram.NewMessage, emoji string) (telegram.InputDocument, error) {
@@ -194,23 +287,9 @@ func kangSticker(m *telegram.NewMessage) error {
 		return err
 	}
 
-	packName := getPackShortName()
-	if packName == "" {
-		result, createErr := createPack(emoji, inputDoc)
-		if createErr != nil {
-			_, err = msg.Edit(locales.Trf("stickers.create_error", createErr.Error()))
-			return err
-		}
-		_, err = msg.Edit(locales.Trf("stickers.kanged", emoji, result.Set.ShortName))
-		return err
-	}
-
-	_, addErr := client.StickersAddStickerToSet(
-		&telegram.InputStickerSetShortName{ShortName: packName},
-		&telegram.InputStickerSetItem{Document: inputDoc, Emoji: emoji},
-	)
-	if addErr != nil {
-		_, err = msg.Edit(locales.Trf("stickers.kang_error", addErr.Error()))
+	packName, err := addStickerToPackOrCreate(inputDoc, emoji)
+	if err != nil {
+		_, err = msg.Edit(locales.Trf("stickers.kang_error", err.Error()))
 		return err
 	}
 	_, err = msg.Edit(locales.Trf("stickers.kanged", emoji, packName))
@@ -264,11 +343,15 @@ func kangPack(m *telegram.NewMessage) error {
 		return err
 	}
 
+	targetPack := strings.TrimSpace(m.Args())
 	msg, _ := eOR(m, locales.Trf("stickers.pkanging", setObj.Set.Title, len(setObj.Documents)))
 
-	packName := getPackShortName()
 	added := 0
 	failed := 0
+
+	if targetPack != "" {
+		setPackShortName(targetPack)
+	}
 
 	for _, doc := range setObj.Documents {
 		docObj, ok := doc.(*telegram.DocumentObj)
@@ -280,29 +363,38 @@ func kangPack(m *telegram.NewMessage) error {
 		emoji := getStickerEmoji(docObj)
 		inputDoc := docToInputDoc(docObj)
 
-		if packName == "" {
-			result, err := createPack(emoji, inputDoc)
-			if err != nil {
-				failed++
-				continue
-			}
-			packName = result.Set.ShortName
-			added++
-			continue
-		}
-
-		_, err := client.StickersAddStickerToSet(
-			&telegram.InputStickerSetShortName{ShortName: packName},
-			&telegram.InputStickerSetItem{Document: inputDoc, Emoji: emoji},
-		)
+		packName, err := addStickerToPackOrCreate(inputDoc, emoji)
 		if err != nil {
 			failed++
 			continue
 		}
+		_ = packName
 		added++
 	}
 
-	_, err = msg.Edit(locales.Trf("stickers.pkanged", added, failed, packName))
+	currentPack := getPackShortName()
+	_, err = msg.Edit(locales.Trf("stickers.pkanged", added, failed, currentPack))
+	return err
+}
+
+func listPacksCmd(m *telegram.NewMessage) error {
+	packs := getAllPacks()
+	if len(packs) == 0 {
+		_, err := eOR(m, locales.Tr("stickers.no_packs"))
+		return err
+	}
+
+	current := getPackShortName()
+	text := locales.Tr("stickers.listpacks_header") + "\n\n"
+	for i, pack := range packs {
+		marker := ""
+		if pack == current {
+			marker = " ✅"
+		}
+		text += fmt.Sprintf(locales.Tr("stickers.listpacks_entry"), i+1, pack, pack, marker) + "\n"
+	}
+
+	_, err := eOR(m, text, &telegram.SendOptions{ParseMode: "HTML"})
 	return err
 }
 
@@ -474,6 +566,7 @@ func loadStickersModule() {
 		{ModuleName: "Stickers", Command: "kang", Description: "Kang a sticker to your pack", Func: kangSticker},
 		{ModuleName: "Stickers", Command: "pkang", Description: "Kang an entire sticker pack", Func: kangPack},
 		{ModuleName: "Stickers", Command: "setpack", Description: "Set or view current sticker pack", Func: setPackCmd},
+		{ModuleName: "Stickers", Command: "listpacks", Description: "List all your sticker packs", Func: listPacksCmd},
 		{ModuleName: "Stickers", Command: "setemoji", Description: "Change sticker emoji", Func: setStickerEmoji, DisAllowSudos: true},
 		{ModuleName: "Stickers", Command: "packname", Description: "Rename your sticker pack", Func: renamePackCmd, DisAllowSudos: true},
 		{ModuleName: "Stickers", Command: "reposition", Description: "Change sticker position", Func: repositionSticker, DisAllowSudos: true},

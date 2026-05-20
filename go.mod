@@ -3,7 +3,7 @@ module NovaUserbot
 go 1.26
 
 require (
-	github.com/amarnathcjd/gogram v1.7.3
+	github.com/amarnathcjd/gogram v1.7.4-0.20260520201000-5b78692e5353
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/joho/godotenv v1.5.1
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
