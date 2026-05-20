@@ -352,3 +352,34 @@ stickers:
   no_packs: "<code>No sticker packs found. Use .kang to create one.</code>"
   listpacks_header: "<b>Your Sticker Packs:</b>"
   listpacks_entry: "%d. <a href='https://t.me/addstickers/%s'>%s</a>%s"
+
+pmbot:
+  start_msg: |
+    <b>👋 Welcome!</b>
+
+    This is the personal assistant bot of <b>%s</b>.
+    You can send your message here and it will be forwarded to them.
+  not_enabled: "<b>🔒 This bot is for private use of %s.</b>"
+  blocked_msg: "<b>❌ You have been blocked from contacting this user.</b>"
+  owner_btn: "Owner"
+  user_info: |
+    <b>📩 New PM Contact</b>
+
+    <b>Name:</b> %s
+    <b>ID:</b> <code>%d</code>
+    <b>Username:</b> %s
+  status: "<b>PM Bot is currently:</b> <code>%s</code>"
+  enabled: "<b>✅ PM Bot enabled.</b>"
+  disabled: "<b>❌ PM Bot disabled.</b>"
+  enable_usage: "<code>Usage: .pmbot &lt;on|off&gt;</code>"
+  setlog_usage: "<code>Usage: .setpmlog &lt;chat_id&gt;</code>"
+  invalid_chat: "<code>Invalid chat ID.</code>"
+  bot_not_in_chat: "<code>Bot is not in that chat.</code>"
+  send_error: "<code>Failed to send message to the chat.</code>"
+  log_set_confirm: "<b>✅ PM Bot logger set to this chat.</b>"
+  log_set: "<b>PM logger group set to:</b> <code>%d</code>"
+  no_log_group: "<code>PM logger group not set. Use .setpmlog first.</code>"
+  block_usage: "<code>Usage: .pmblock &lt;user_id&gt; or use in topic</code>"
+  unblock_usage: "<code>Usage: .pmunblock &lt;user_id&gt; or use in topic</code>"
+  user_blocked: "<b>🚫 Blocked <a href='tg://user?id=%d'>%s</a> from PM Bot.</b>"
+  user_unblocked: "<b>✅ Unblocked <a href='tg://user?id=%d'>%s</a> from PM Bot.</b>"
