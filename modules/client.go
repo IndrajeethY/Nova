@@ -81,10 +81,11 @@ func GetHelpModule(module string) ([]Handler, bool) {
 func InitTgClients() (*telegram.Client, error) {
 	var err error
 	client, err = telegram.NewClient(telegram.ClientConfig{
-		AppID:       cfg.ApiID,
-		AppHash:     cfg.ApiHash,
-		LogLevel:    telegram.LogInfo,
-		SessionName: "asstub",
+		AppID:         cfg.ApiID,
+		AppHash:       cfg.ApiHash,
+		LogLevel:      telegram.LogInfo,
+		StringSession: cfg.StringSession,
+		SessionName:   "asstub",
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create userbot client: %w", err)
@@ -142,9 +143,13 @@ func AddHandler(h *Handler, c *telegram.Client) {
 			cmdPrefix = "."
 		}
 		pattern := fmt.Sprintf("message:%s%s( (.*)|$)", regexp.QuoteMeta(cmdPrefix), h.Command)
-		c.On(pattern, h.Func, telegram.CustomFilter(func(m *telegram.NewMessage) bool {
-			return m.Sender.ID == ubId || (IsSudoer(m.Sender.ID) && !h.DisAllowSudos)
-		}))
+		disallow := h.DisAllowSudos
+		c.On(pattern, h.Func, telegram.Any(
+			telegram.IsOutgoing,
+			telegram.CustomFilter(func(m *telegram.NewMessage) bool {
+				return IsSudoer(m.Sender.ID) && !disallow
+			}),
+		))
 	}
 	if h.Description != "" {
 		AddHelpEntry(h.ModuleName, *h)
