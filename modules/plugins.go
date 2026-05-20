@@ -149,6 +149,18 @@ func listPlugins(m *telegram.NewMessage) error {
 	return err
 }
 
+func restartBotCmd(m *telegram.NewMessage) error {
+	_, _ = eOR(m, locales.Tr("system.restarting"))
+	restartBot()
+	return nil
+}
+
+func shutdownBot(m *telegram.NewMessage) error {
+	_, _ = eOR(m, locales.Tr("system.shutting_down"))
+	os.Exit(0)
+	return nil
+}
+
 func restartBot() {
 	binary, err := os.Executable()
 	if err != nil {
@@ -162,6 +174,8 @@ func loadPluginsModule() {
 		{ModuleName: "Plugins", Command: "install", Description: "Install a plugin from URL", Func: installPlugin, DisAllowSudos: true},
 		{ModuleName: "Plugins", Command: "uninstall", Description: "Uninstall a plugin by name", Func: uninstallPlugin, DisAllowSudos: true},
 		{ModuleName: "Plugins", Command: "plugins", Description: "List installed plugins", Func: listPlugins},
+		{ModuleName: "Plugins", Command: "restart", Description: "Restart the userbot", Func: restartBotCmd, DisAllowSudos: true},
+		{ModuleName: "Plugins", Command: "shutdown", Description: "Shutdown the userbot", Func: shutdownBot, DisAllowSudos: true},
 	}
 	AddHandlers(handlers, client)
 }

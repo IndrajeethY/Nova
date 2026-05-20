@@ -4,6 +4,8 @@ language:
 
 system:
   started: "NovaUserbot started in %s"
+  restarting: "<code>Restarting NovaUserbot...</code>"
+  shutting_down: "<code>Shutting down NovaUserbot...</code>"
 
 common:
   no_reason: "No reason"
