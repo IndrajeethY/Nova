@@ -85,6 +85,29 @@ func DelAllKeys(m *telegram.NewMessage) error {
 	return err
 }
 
+var configKeys = []struct {
+	Key  string
+	Desc string
+}{
+	{"ALIVE_IMAGE", "Image/media URL for .alive command"},
+	{"CMD_HANDLER", "Command prefix (default: .)"},
+	{"LOG_CHAT", "Chat ID for log messages"},
+	{"TAG_LOGGER", "Chat ID for tag notifications"},
+	{"PM_AI_PROMT", "Custom AI prompt for PM permit"},
+	{"PM_BOT_ENABLED", "PM Bot toggle (true/false)"},
+	{"PM_BOT_LOG_GROUP", "Forum group ID for PM Bot topics"},
+}
+
+func AvailableKeys(m *telegram.NewMessage) error {
+	var b strings.Builder
+	for _, k := range configKeys {
+		fmt.Fprintf(&b, locales.Tr("database.keys_entry"), k.Key, k.Desc)
+		b.WriteString("\n")
+	}
+	_, err := eOR(m, locales.Trf("database.keys_header", len(configKeys), b.String()), &telegram.SendOptions{ParseMode: "HTML"})
+	return err
+}
+
 func loadDbModule() {
 	handlers := []*Handler{
 		{Func: SetKey, Command: "setkey", Description: "Set a key in the database", ModuleName: "Database"},
@@ -92,6 +115,7 @@ func loadDbModule() {
 		{Func: DelKey, Command: "delkey", Description: "Delete a key from the database", ModuleName: "Database"},
 		{Func: ListKeys, Command: "listkeys", Description: "List all keys in the database", ModuleName: "Database"},
 		{Func: DelAllKeys, Command: "delallkeys", Description: "Delete all keys from the database", ModuleName: "Database"},
+		{Func: AvailableKeys, Command: "keys", Description: "Show all available config keys", ModuleName: "Database"},
 	}
 	AddHandlers(handlers, client)
 }

@@ -52,6 +52,8 @@ database:
   usage_setkey: "<code>Usage: .setkey &lt;key&gt; &lt;value&gt;</code>"
   usage_getkey: "<code>Usage: .getkey &lt;key&gt;</code>"
   usage_delkey: "<code>Usage: .delkey &lt;key&gt;</code>"
+  keys_header: "<b>Available Config Keys:</b> (<code>%d</code>)\n\n%s"
+  keys_entry: "<b>▸</b> <code>%s</code> — %s"
 
 admin:
   banning: "<code>Banning user...</code>"
