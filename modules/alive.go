@@ -35,7 +35,7 @@ func loadAliveModule() {
 	AddHandler(&Handler{
 		Func:        Alive,
 		Command:     "alive",
-		Description: "Check if the bot is alive",
+		Description: locales.Tr("desc.alive"),
 		ModuleName:  "Alive",
 	}, client)
 }

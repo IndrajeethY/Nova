@@ -148,9 +148,9 @@ func ApprovedUsers(m *telegram.NewMessage) error {
 
 func loadPmPermitModule() {
 	handlers := []*Handler{
-		{ModuleName: "PM Permit", Command: "ap", Description: "Approve a user to bypass PM assistant", Func: ApproveUser},
-		{ModuleName: "PM Permit", Command: "dap", Description: "Disapprove a user", Func: DisapproveUser},
-		{ModuleName: "PM Permit", Command: "approved", Description: "List approved users", Func: ApprovedUsers},
+		{ModuleName: "PM Permit", Command: "ap", Description: locales.Tr("desc.ap"), Func: ApproveUser},
+		{ModuleName: "PM Permit", Command: "dap", Description: locales.Tr("desc.dap"), Func: DisapproveUser},
+		{ModuleName: "PM Permit", Command: "approved", Description: locales.Tr("desc.approved"), Func: ApprovedUsers},
 	}
 	AddHandlers(handlers, client)
 	client.On("message", OnPrivateMessage)

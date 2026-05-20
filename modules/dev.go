@@ -281,9 +281,9 @@ func performEval(code string, m *telegram.NewMessage) (string, error) {
 
 func loadDevModule() {
 	handlers := []*Handler{
-		{ModuleName: "Dev Tools", Command: "sh", Description: "Run shell commands", Func: ShellHandle, DisAllowSudos: true},
-		{ModuleName: "Dev Tools", Command: "eval", Description: "Eval Go code", Func: EvalHandle, DisAllowSudos: true},
-		{ModuleName: "Dev Tools", Command: "json", Description: "Get JSON of a message", Func: JsonHandle},
+		{ModuleName: "Dev Tools", Command: "sh", Description: locales.Tr("desc.sh"), Func: ShellHandle, DisAllowSudos: true},
+		{ModuleName: "Dev Tools", Command: "eval", Description: locales.Tr("desc.eval"), Func: EvalHandle, DisAllowSudos: true},
+		{ModuleName: "Dev Tools", Command: "json", Description: locales.Tr("desc.json"), Func: JsonHandle},
 	}
 	AddHandlers(handlers, client)
 }

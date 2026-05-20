@@ -139,5 +139,5 @@ func loadHelpModule() {
 	LoadModulesOrder()
 	tgbot.AddInlineCallbackHandler("help", HelpCbk)
 	tgbot.On("inline:help", HelpInline)
-	AddHandler(&Handler{Command: "help", Func: HelpCmd}, client)
+	AddHandler(&Handler{Command: "help", Description: locales.Tr("desc.help"), Func: HelpCmd, ModuleName: "Help"}, client)
 }

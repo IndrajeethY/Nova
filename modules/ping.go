@@ -75,8 +75,8 @@ func PingHandler(m *telegram.NewMessage) error {
 
 func loadPingModule() {
 	handlers := []*Handler{
-		{ModuleName: "Ping", Command: "ping", Description: "Ping the userbot", Func: PingHandler},
-		{ModuleName: "Ping", Command: "dcping", Description: "Ping all data centers", Func: DCPingHandler},
+		{ModuleName: "Ping", Command: "ping", Description: locales.Tr("desc.ping"), Func: PingHandler},
+		{ModuleName: "Ping", Command: "dcping", Description: locales.Tr("desc.dcping"), Func: DCPingHandler},
 	}
 	AddHandlers(handlers, client)
 }

@@ -182,11 +182,11 @@ func restartBot() {
 
 func loadPluginsModule() {
 	handlers := []*Handler{
-		{ModuleName: "Plugins", Command: "install", Description: "Install a plugin from URL", Func: installPlugin, DisAllowSudos: true},
-		{ModuleName: "Plugins", Command: "uninstall", Description: "Uninstall a plugin by name", Func: uninstallPlugin, DisAllowSudos: true},
-		{ModuleName: "Plugins", Command: "plugins", Description: "List installed plugins", Func: listPlugins},
-		{ModuleName: "Plugins", Command: "restart", Description: "Restart the userbot", Func: restartBotCmd, DisAllowSudos: true},
-		{ModuleName: "Plugins", Command: "shutdown", Description: "Shutdown the userbot", Func: shutdownBot, DisAllowSudos: true},
+		{ModuleName: "Plugins", Command: "install", Description: locales.Tr("desc.install"), Func: installPlugin, DisAllowSudos: true},
+		{ModuleName: "Plugins", Command: "uninstall", Description: locales.Tr("desc.uninstall"), Func: uninstallPlugin, DisAllowSudos: true},
+		{ModuleName: "Plugins", Command: "plugins", Description: locales.Tr("desc.plugins"), Func: listPlugins},
+		{ModuleName: "Plugins", Command: "restart", Description: locales.Tr("desc.restart"), Func: restartBotCmd, DisAllowSudos: true},
+		{ModuleName: "Plugins", Command: "shutdown", Description: locales.Tr("desc.shutdown"), Func: shutdownBot, DisAllowSudos: true},
 	}
 	AddHandlers(handlers, client)
 }

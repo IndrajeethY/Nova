@@ -102,9 +102,9 @@ func CheckForTags(m *telegram.NewMessage) error {
 
 func loadTagLoggerModule() {
 	handlers := []*Handler{
-		{Command: "taglogger", Func: SetTagLogger, Description: "Set a chat as tag logger", ModuleName: "Tag Logger"},
-		{Command: "gettaglogger", Func: GetTagLogger, Description: "Get the tag logger chat", ModuleName: "Tag Logger"},
-		{Command: "deltaglogger", Func: DelTagLogger, Description: "Delete the tag logger chat", ModuleName: "Tag Logger"},
+		{Command: "taglogger", Func: SetTagLogger, Description: locales.Tr("desc.taglogger"), ModuleName: "Tag Logger"},
+		{Command: "gettaglogger", Func: GetTagLogger, Description: locales.Tr("desc.gettaglogger"), ModuleName: "Tag Logger"},
+		{Command: "deltaglogger", Func: DelTagLogger, Description: locales.Tr("desc.deltaglogger"), ModuleName: "Tag Logger"},
 	}
 	AddHandlers(handlers, client)
 	client.AddMessageHandler(telegram.OnNewMessage, CheckForTags)

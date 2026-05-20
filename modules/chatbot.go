@@ -96,7 +96,7 @@ func loadChatBotModule() {
 	AddHandler(&Handler{
 		ModuleName:  "ChatBot",
 		Command:     "ai",
-		Description: "Fetch response from Gemini AI",
+		Description: locales.Tr("desc.ask"),
 		Func:        geminiAi,
 	}, client)
 	client.On("message", OnChatBotMessage)

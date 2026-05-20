@@ -198,7 +198,8 @@ func toggleAntispam(m *telegram.NewMessage) error {
 		_, err := eOR(m, locales.Tr("gban.antispam_on"))
 		return err
 	}
-	if args == "enable" {
+	switch args {
+	case "enable":
 		err := Db.SRem(context.Background(), "ANTISPAM_DISABLED", m.Chat.ID).Err()
 		if err != nil {
 			log.Error("Error enabling antispam:", err)
@@ -206,7 +207,7 @@ func toggleAntispam(m *telegram.NewMessage) error {
 		}
 		_, err = eOR(m, locales.Tr("gban.antispam_enabled"))
 		return err
-	} else if args == "disable" {
+	case "disable":
 		err := Db.SAdd(context.Background(), "ANTISPAM_DISABLED", m.Chat.ID).Err()
 		if err != nil {
 			log.Error("Error disabling antispam:", err)
@@ -221,10 +222,10 @@ func toggleAntispam(m *telegram.NewMessage) error {
 
 func loadGbanModule() {
 	handlers := []*Handler{
-		{ModuleName: "Gban", Command: "gban", Description: "Globally ban a user", Func: gbanUser},
-		{ModuleName: "Gban", Command: "ungban", Description: "Globally unban a user", Func: ungbanUser},
-		{ModuleName: "Gban", Command: "antispam", Description: "Toggle antispam in a chat", Func: toggleAntispam},
-		{ModuleName: "Gban", Command: "gbanned", Description: "List all globally banned users", Func: gbanned},
+		{ModuleName: "Gban", Command: "gban", Description: locales.Tr("desc.gban"), Func: gbanUser},
+		{ModuleName: "Gban", Command: "ungban", Description: locales.Tr("desc.ungban"), Func: ungbanUser},
+		{ModuleName: "Gban", Command: "antispam", Description: locales.Tr("desc.antispam"), Func: toggleAntispam},
+		{ModuleName: "Gban", Command: "gbanned", Description: locales.Tr("desc.gbanned"), Func: gbanned},
 	}
 	AddHandlers(handlers, client)
 }

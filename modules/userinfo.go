@@ -399,13 +399,13 @@ func leftChatsCmd(m *telegram.NewMessage) error {
 
 func loadUserInfoModule() {
 	handlers := []*Handler{
-		{Command: "stats", Description: "Fetch complete stats", Func: StatsCmd, ModuleName: "User Info"},
-		{Command: "info", Description: "Fetch info about a user", Func: userInfo, ModuleName: "User Info"},
-		{Command: "id", Description: "Fetch ID of user or sender", Func: idCmd, ModuleName: "User Info"},
-		{Command: "deletepfp", Description: "Delete all profile photos", Func: deletePfpCmd, ModuleName: "User Info"},
-		{Command: "mygroups", Description: "Fetch owned groups", Func: myGroupsCmd, ModuleName: "User Info"},
-		{Command: "mychannels", Description: "Fetch owned channels", Func: myChannelsCmd, ModuleName: "User Info"},
-		{Command: "leftchats", Description: "Fetch left chats", Func: leftChatsCmd, ModuleName: "User Info"},
+		{Command: "stats", Description: locales.Tr("desc.stats"), Func: StatsCmd, ModuleName: "User Info"},
+		{Command: "info", Description: locales.Tr("desc.info"), Func: userInfo, ModuleName: "User Info"},
+		{Command: "id", Description: locales.Tr("desc.id"), Func: idCmd, ModuleName: "User Info"},
+		{Command: "deletepfp", Description: locales.Tr("desc.deletepfp"), Func: deletePfpCmd, ModuleName: "User Info"},
+		{Command: "mygroups", Description: locales.Tr("desc.mygroups"), Func: myGroupsCmd, ModuleName: "User Info"},
+		{Command: "mychannels", Description: locales.Tr("desc.mychannels"), Func: myChannelsCmd, ModuleName: "User Info"},
+		{Command: "leftchats", Description: locales.Tr("desc.leftchats"), Func: leftChatsCmd, ModuleName: "User Info"},
 	}
 	AddHandlers(handlers, client)
 }

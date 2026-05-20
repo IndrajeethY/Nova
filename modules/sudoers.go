@@ -76,9 +76,9 @@ func ListSudo(m *telegram.NewMessage) error {
 
 func loadSudoModule() {
 	handlers := []*Handler{
-		{Command: "addsudo", Func: AddSudo, Description: "Add user as sudo", ModuleName: "Sudoers", DisAllowSudos: true},
-		{Command: "delsudo", Func: DelSudo, Description: "Remove user from sudo", ModuleName: "Sudoers", DisAllowSudos: true},
-		{Command: "listsudo", Func: ListSudo, Description: "List all sudos", ModuleName: "Sudoers"},
+		{Command: "addsudo", Func: AddSudo, Description: locales.Tr("desc.addsudo"), ModuleName: "Sudoers", DisAllowSudos: true},
+		{Command: "delsudo", Func: DelSudo, Description: locales.Tr("desc.delsudo"), ModuleName: "Sudoers", DisAllowSudos: true},
+		{Command: "listsudo", Func: ListSudo, Description: locales.Tr("desc.listsudo"), ModuleName: "Sudoers"},
 	}
 	AddHandlers(handlers, client)
 }

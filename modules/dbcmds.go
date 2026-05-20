@@ -110,12 +110,12 @@ func AvailableKeys(m *telegram.NewMessage) error {
 
 func loadDbModule() {
 	handlers := []*Handler{
-		{Func: SetKey, Command: "setkey", Description: "Set a key in the database", ModuleName: "Database"},
-		{Func: GetKey, Command: "getkey", Description: "Get a key from the database", ModuleName: "Database"},
-		{Func: DelKey, Command: "delkey", Description: "Delete a key from the database", ModuleName: "Database"},
-		{Func: ListKeys, Command: "listkeys", Description: "List all keys in the database", ModuleName: "Database"},
-		{Func: DelAllKeys, Command: "delallkeys", Description: "Delete all keys from the database", ModuleName: "Database"},
-		{Func: AvailableKeys, Command: "keys", Description: "Show all available config keys", ModuleName: "Database"},
+		{Func: SetKey, Command: "setkey", Description: locales.Tr("desc.setkey"), ModuleName: "Database"},
+		{Func: GetKey, Command: "getkey", Description: locales.Tr("desc.getkey"), ModuleName: "Database"},
+		{Func: DelKey, Command: "delkey", Description: locales.Tr("desc.delkey"), ModuleName: "Database"},
+		{Func: ListKeys, Command: "listkeys", Description: locales.Tr("desc.listkeys"), ModuleName: "Database"},
+		{Func: DelAllKeys, Command: "delallkeys", Description: locales.Tr("desc.delallkeys"), ModuleName: "Database"},
+		{Func: AvailableKeys, Command: "keys", Description: locales.Tr("desc.keys"), ModuleName: "Database"},
 	}
 	AddHandlers(handlers, client)
 }

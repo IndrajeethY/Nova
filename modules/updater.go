@@ -62,7 +62,7 @@ func loadUpdaterModule() {
 	AddHandler(&Handler{
 		ModuleName:    "Updater",
 		Command:       "update",
-		Description:   "Check for and apply updates",
+		Description:   locales.Tr("desc.update"),
 		Func:          checkUpdate,
 		DisAllowSudos: true,
 	}, client)

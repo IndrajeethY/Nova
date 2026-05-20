@@ -563,15 +563,15 @@ func setPackCmd(m *telegram.NewMessage) error {
 
 func loadStickersModule() {
 	handlers := []*Handler{
-		{ModuleName: "Stickers", Command: "kang", Description: "Kang a sticker to your pack", Func: kangSticker},
-		{ModuleName: "Stickers", Command: "pkang", Description: "Kang an entire sticker pack", Func: kangPack},
-		{ModuleName: "Stickers", Command: "setpack", Description: "Set or view current sticker pack", Func: setPackCmd},
-		{ModuleName: "Stickers", Command: "listpacks", Description: "List all your sticker packs", Func: listPacksCmd},
-		{ModuleName: "Stickers", Command: "setemoji", Description: "Change sticker emoji", Func: setStickerEmoji, DisAllowSudos: true},
-		{ModuleName: "Stickers", Command: "packname", Description: "Rename your sticker pack", Func: renamePackCmd, DisAllowSudos: true},
-		{ModuleName: "Stickers", Command: "reposition", Description: "Change sticker position", Func: repositionSticker, DisAllowSudos: true},
-		{ModuleName: "Stickers", Command: "rmstick", Description: "Remove sticker from pack", Func: removeSticker, DisAllowSudos: true},
-		{ModuleName: "Stickers", Command: "favstick", Description: "Add/remove sticker from favorites", Func: favSticker},
+		{ModuleName: "Stickers", Command: "kang", Description: locales.Tr("desc.kang"), Func: kangSticker},
+		{ModuleName: "Stickers", Command: "pkang", Description: locales.Tr("desc.pkang"), Func: kangPack},
+		{ModuleName: "Stickers", Command: "setpack", Description: locales.Tr("desc.setpack"), Func: setPackCmd},
+		{ModuleName: "Stickers", Command: "listpacks", Description: locales.Tr("desc.listpacks"), Func: listPacksCmd},
+		{ModuleName: "Stickers", Command: "setemoji", Description: locales.Tr("desc.setemoji"), Func: setStickerEmoji, DisAllowSudos: true},
+		{ModuleName: "Stickers", Command: "packname", Description: locales.Tr("desc.packname"), Func: renamePackCmd, DisAllowSudos: true},
+		{ModuleName: "Stickers", Command: "reposition", Description: locales.Tr("desc.reposition"), Func: repositionSticker, DisAllowSudos: true},
+		{ModuleName: "Stickers", Command: "rmstick", Description: locales.Tr("desc.rmstick"), Func: removeSticker, DisAllowSudos: true},
+		{ModuleName: "Stickers", Command: "favstick", Description: locales.Tr("desc.favstick"), Func: favSticker},
 	}
 	AddHandlers(handlers, client)
 }

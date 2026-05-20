@@ -420,10 +420,10 @@ func pmBotUnblockCmd(m *telegram.NewMessage) error {
 
 func loadPmBotModule() {
 	handlers := []*Handler{
-		{ModuleName: "PM Bot", Command: "pmbot", Description: "Enable/disable PM bot (on/off)", Func: pmBotEnableCmd},
-		{ModuleName: "PM Bot", Command: "setpmlog", Description: "Set PM logger group (chat ID)", Func: pmBotSetLogCmd},
-		{ModuleName: "PM Bot", Command: "pmblock", Description: "Block a user from PM bot", Func: pmBotBlockCmd},
-		{ModuleName: "PM Bot", Command: "pmunblock", Description: "Unblock a user from PM bot", Func: pmBotUnblockCmd},
+		{ModuleName: "PM Bot", Command: "pmbot", Description: locales.Tr("desc.pmbot"), Func: pmBotEnableCmd},
+		{ModuleName: "PM Bot", Command: "setpmlog", Description: locales.Tr("desc.setpmlog"), Func: pmBotSetLogCmd},
+		{ModuleName: "PM Bot", Command: "pmblock", Description: locales.Tr("desc.pmblock"), Func: pmBotBlockCmd},
+		{ModuleName: "PM Bot", Command: "pmunblock", Description: locales.Tr("desc.pmunblock"), Func: pmBotUnblockCmd},
 	}
 	AddHandlers(handlers, client)
 

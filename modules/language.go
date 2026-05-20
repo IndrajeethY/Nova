@@ -67,8 +67,8 @@ func GetLanguage(m *telegram.NewMessage) error {
 
 func loadLanguageModule() {
 	handlers := []*Handler{
-		{Func: SetLanguage, Command: "setlang", Description: "Set bot language", ModuleName: "Language"},
-		{Func: GetLanguage, Command: "lang", Description: "Show current language", ModuleName: "Language"},
+		{Func: SetLanguage, Command: "setlang", Description: locales.Tr("desc.setlang"), ModuleName: "Language"},
+		{Func: GetLanguage, Command: "lang", Description: locales.Tr("desc.lang"), ModuleName: "Language"},
 	}
 	AddHandlers(handlers, client)
 }
