@@ -4,6 +4,7 @@
 *.so
 *.dylib
 *.out
+main
 
 go.work
 
@@ -19,6 +20,8 @@ bot_logs.json
 
 .env
 .claude/
+.agents/
+skills-lock.json
 
 tmp/
 out.txt
