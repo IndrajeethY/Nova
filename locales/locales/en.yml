@@ -431,12 +431,8 @@ stickers:
   listpacks_entry: "%d. <a href='https://t.me/addstickers/%s'>%s</a>%s"
 
 pmbot:
-  start_msg: |
-    <b>👋 Welcome!</b>
-
-    This is the personal assistant bot of <b>%s</b>.
-    You can send your message here and it will be forwarded to them.
-  not_enabled: "<b>🔒 This bot is for private use of %s.</b>"
+  start_msg: "<b>👋 Welcome!</b>\n\nThis is the personal assistant bot of <b>%s</b>."
+  start_msg_active: "\nYou can send your message here and it will be forwarded to them."
   blocked_msg: "<b>❌ You have been blocked from contacting this user.</b>"
   owner_btn: "Owner"
   user_info: |

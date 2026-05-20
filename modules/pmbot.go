@@ -182,19 +182,7 @@ func onBotPrivateMessage(m *telegram.NewMessage) error {
 	}
 
 	if !isPmBotEnabled() {
-		opts := &telegram.SendOptions{ParseMode: "HTML"}
-		ownerUser, _ := tgbot.GetUser(ubId)
-		if ownerUser != nil {
-			btn := telegram.ButtonBuilder{}
-			opts.ReplyMarkup = telegram.NewKeyboard().AddRow(
-				btn.Mention("👤 "+ownerUser.FirstName, &telegram.InputUserObj{
-					UserID:     ownerUser.ID,
-					AccessHash: ownerUser.AccessHash,
-				}),
-			).Build()
-		}
-		_, err := m.Reply(locales.Trf("pmbot.not_enabled", client.Me().FirstName), opts)
-		return err
+		return nil
 	}
 
 	if isUserBlocked(m.Sender.ID) {
@@ -240,8 +228,13 @@ func onBotStart(m *telegram.NewMessage) error {
 		ownerName += " " + client.Me().LastName
 	}
 
+	text := locales.Trf("pmbot.start_msg", ownerName)
+	if isPmBotEnabled() {
+		text += locales.Tr("pmbot.start_msg_active")
+	}
+
 	markup := buildStartKeyboard()
-	_, err := m.Reply(locales.Trf("pmbot.start_msg", ownerName), &telegram.SendOptions{
+	_, err := m.Reply(text, &telegram.SendOptions{
 		ParseMode:   "HTML",
 		ReplyMarkup: markup,
 	})
