@@ -83,7 +83,7 @@ func geminiAi(m *telegram.NewMessage) error {
 		_, err = msg.Edit(locales.Tr("chatbot.error"))
 		return err
 	}
-	_, err = msg.Edit(locales.Trf("chatbot.result", args, result), telegram.SendOptions{ParseMode: "Markdown"})
+	_, err = msg.Edit(locales.Trf("chatbot.result", args, result), &telegram.SendOptions{ParseMode: "Markdown"})
 	return err
 }
 

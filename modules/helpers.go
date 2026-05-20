@@ -31,7 +31,7 @@ func msgLink(m *telegram.NewMessage) string {
 	}
 }
 
-func eOR(m *telegram.NewMessage, text string, opts ...telegram.SendOptions) (*telegram.NewMessage, error) {
+func eOR(m *telegram.NewMessage, text string, opts ...*telegram.SendOptions) (*telegram.NewMessage, error) {
 	if m.Sender.ID == ubId {
 		return m.Edit(text, opts...)
 	}

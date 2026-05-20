@@ -41,78 +41,78 @@ func StatsCmd(m *telegram.NewMessage) error {
 		unreadmsgs, mentions, reactions                                                                                     int32
 	)
 	msg, _ := eOR(m, locales.Tr("userinfo.fetching_stats"))
-	dialogs, _ := client.IterDialogs(&telegram.DialogOptions{SleepThresholdMs: 10, Limit: 5000})
-	for v := range dialogs {
-		if d, ok := v.(*telegram.DialogObj); ok {
-			if !d.NotifySettings.Silent {
+	client.IterDialogs(func(d *telegram.TLDialog) error {
+		if dlg, ok := d.Dialog.(*telegram.DialogObj); ok {
+			if !dlg.NotifySettings.Silent {
 				notify++
 			}
-			if d.UnreadCount > 0 {
-				unreadmsgs += d.UnreadCount
+			if dlg.UnreadCount > 0 {
+				unreadmsgs += dlg.UnreadCount
 			}
-			if d.UnreadMentionsCount > 0 {
-				mentions += d.UnreadMentionsCount
+			if dlg.UnreadMentionsCount > 0 {
+				mentions += dlg.UnreadMentionsCount
 			}
-			if d.UnreadReactionsCount > 0 {
-				reactions += d.UnreadReactionsCount
+			if dlg.UnreadReactionsCount > 0 {
+				reactions += dlg.UnreadReactionsCount
 			}
-			if d.Pinned {
+			if dlg.Pinned {
 				pinned++
 			}
-			switch p := d.Peer.(type) {
-			case *telegram.PeerChannel:
-				total++
-				chatInfo, err := client.GetChannel(p.ChannelID)
-				if err != nil {
-					continue
+		}
+		switch p := d.Peer.(type) {
+		case *telegram.PeerChannel:
+			total++
+			chatInfo, err := client.GetChannel(p.ChannelID)
+			if err != nil {
+				return nil
+			}
+			if chatInfo.Creator {
+				creator++
+			}
+			if chatInfo.Broadcast {
+				if chatInfo.AdminRights == nil {
+					adminch++
 				}
-				if chatInfo.Creator {
-					creator++
-				}
-				if chatInfo.Broadcast {
-					if chatInfo.AdminRights == nil {
-						adminch++
-					}
-					channels++
-				} else {
-					if chatInfo.AdminRights != nil {
-						admingc++
-					}
-					grps++
-				}
-			case *telegram.PeerUser:
-				total++
-				userInfo, err := client.GetUser(p.UserID)
-				if err != nil {
-					continue
-				}
-				if userInfo.Deleted {
-					deleted++
-				}
-				if userInfo.Bot {
-					bots++
-				} else {
-					users++
-				}
-				if userInfo.MutualContact {
-					mutuals++
-				}
-				if userInfo.Contact {
-					contacts++
-				}
-			case *telegram.PeerChat:
-				total++
-				chatInfo, err := client.GetChat(p.ChatID)
-				if err != nil {
-					continue
-				}
+				channels++
+			} else {
 				if chatInfo.AdminRights != nil {
 					admingc++
 				}
 				grps++
 			}
+		case *telegram.PeerUser:
+			total++
+			userInfo, err := client.GetUser(p.UserID)
+			if err != nil {
+				return nil
+			}
+			if userInfo.Deleted {
+				deleted++
+			}
+			if userInfo.Bot {
+				bots++
+			} else {
+				users++
+			}
+			if userInfo.MutualContact {
+				mutuals++
+			}
+			if userInfo.Contact {
+				contacts++
+			}
+		case *telegram.PeerChat:
+			total++
+			chatInfo, err := client.GetChat(p.ChatID)
+			if err != nil {
+				return nil
+			}
+			if chatInfo.AdminRights != nil {
+				admingc++
+			}
+			grps++
 		}
-	}
+		return nil
+	}, &telegram.DialogOptions{SleepThresholdMs: 10, Limit: 5000})
 	blocked, err := client.ContactsGetBlocked(false, 0, 5000)
 	if err == nil {
 		if obj, ok := blocked.(*telegram.ContactsBlockedObj); ok {
@@ -276,29 +276,27 @@ func deletePfpCmd(m *telegram.NewMessage) error {
 
 func myGroupsCmd(m *telegram.NewMessage) error {
 	msg, _ := eOR(m, locales.Tr("userinfo.groups_fetching"))
-	dialogs, _ := client.IterDialogs(&telegram.DialogOptions{SleepThresholdMs: 10, Limit: 5000})
 	var result string
 	count := 0
-	for v := range dialogs {
-		if d, ok := v.(*telegram.DialogObj); ok {
-			switch p := d.Peer.(type) {
-			case *telegram.PeerChannel:
-				chatInfo, err := client.GetChannel(p.ChannelID)
-				if err != nil || !chatInfo.Creator || chatInfo.Broadcast {
-					continue
-				}
-				result += fmt.Sprintf(locales.Tr("userinfo.groups_entry"), chatInfo.Title, chatInfo.ID)
-				count++
-			case *telegram.PeerChat:
-				chatInfo, err := client.GetChat(p.ChatID)
-				if err != nil || !chatInfo.Creator {
-					continue
-				}
-				result += fmt.Sprintf(locales.Tr("userinfo.groups_entry"), chatInfo.Title, chatInfo.ID)
-				count++
+	client.IterDialogs(func(d *telegram.TLDialog) error {
+		switch p := d.Peer.(type) {
+		case *telegram.PeerChannel:
+			chatInfo, err := client.GetChannel(p.ChannelID)
+			if err != nil || !chatInfo.Creator || chatInfo.Broadcast {
+				return nil
 			}
+			result += fmt.Sprintf(locales.Tr("userinfo.groups_entry"), chatInfo.Title, chatInfo.ID)
+			count++
+		case *telegram.PeerChat:
+			chatInfo, err := client.GetChat(p.ChatID)
+			if err != nil || !chatInfo.Creator {
+				return nil
+			}
+			result += fmt.Sprintf(locales.Tr("userinfo.groups_entry"), chatInfo.Title, chatInfo.ID)
+			count++
 		}
-	}
+		return nil
+	}, &telegram.DialogOptions{SleepThresholdMs: 10, Limit: 5000})
 	if count == 0 {
 		result = locales.Tr("userinfo.groups_none")
 	}
@@ -308,24 +306,22 @@ func myGroupsCmd(m *telegram.NewMessage) error {
 
 func myChannelsCmd(m *telegram.NewMessage) error {
 	msg, _ := eOR(m, locales.Tr("userinfo.channels_fetching"))
-	dialogs, _ := client.IterDialogs(&telegram.DialogOptions{SleepThresholdMs: 10, Limit: 5000})
 	var result string
 	count := 0
-	for v := range dialogs {
-		if d, ok := v.(*telegram.DialogObj); ok {
-			if p, ok := d.Peer.(*telegram.PeerChannel); ok {
-				chatInfo, err := client.GetChannel(p.ChannelID)
-				if err != nil || !chatInfo.Creator || !chatInfo.Broadcast {
-					continue
-				}
-				result += fmt.Sprintf(locales.Tr("userinfo.channels_entry"), chatInfo.Title, chatInfo.ID)
-				if chatInfo.Username != "" {
-					result += fmt.Sprintf("t.me/%s\n", chatInfo.Username)
-				}
-				count++
+	client.IterDialogs(func(d *telegram.TLDialog) error {
+		if p, ok := d.Peer.(*telegram.PeerChannel); ok {
+			chatInfo, err := client.GetChannel(p.ChannelID)
+			if err != nil || !chatInfo.Creator || !chatInfo.Broadcast {
+				return nil
 			}
+			result += fmt.Sprintf(locales.Tr("userinfo.channels_entry"), chatInfo.Title, chatInfo.ID)
+			if chatInfo.Username != "" {
+				result += fmt.Sprintf("t.me/%s\n", chatInfo.Username)
+			}
+			count++
 		}
-	}
+		return nil
+	}, &telegram.DialogOptions{SleepThresholdMs: 10, Limit: 5000})
 	if count == 0 {
 		result = locales.Tr("userinfo.channels_none")
 	}

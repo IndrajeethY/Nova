@@ -70,7 +70,7 @@ func ListKeys(m *telegram.NewMessage) error {
 	for _, key := range keys {
 		formatted = append(formatted, fmt.Sprintf(locales.Tr("database.list_entry"), key))
 	}
-	_, err = eOR(m, locales.Trf("database.list_header", len(keys), strings.Join(formatted, "\n")), telegram.SendOptions{ParseMode: "HTML"})
+	_, err = eOR(m, locales.Trf("database.list_header", len(keys), strings.Join(formatted, "\n")), &telegram.SendOptions{ParseMode: "HTML"})
 	return err
 }
 

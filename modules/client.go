@@ -78,7 +78,7 @@ func AddHandler(h *Handler, c *telegram.Client) {
 			cmdPrefix = "."
 		}
 		pattern := fmt.Sprintf("message:%s%s( (.*)|$)", cmdPrefix, h.Command)
-		c.On(pattern, h.Func, telegram.FilterFunc(func(m *telegram.NewMessage) bool {
+		c.On(pattern, h.Func, telegram.CustomFilter(func(m *telegram.NewMessage) bool {
 			return m.Sender.ID == ubId || (utils.IsIn64Array(sudoers, m.Sender.ID) && !h.DisAllowSudos)
 		}))
 	}

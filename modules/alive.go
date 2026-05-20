@@ -24,9 +24,9 @@ func Alive(m *telegram.NewMessage) error {
 	)
 	aliveimage, err := Db.Get(context.Background(), "ALIVE_IMAGE").Result()
 	if err == nil {
-		_, err = eOR(m, message, telegram.SendOptions{ParseMode: "HTML", Media: aliveimage})
+		_, err = eOR(m, message, &telegram.SendOptions{ParseMode: "HTML", Media: aliveimage})
 	} else {
-		_, err = eOR(m, message, telegram.SendOptions{ParseMode: "HTML"})
+		_, err = eOR(m, message, &telegram.SendOptions{ParseMode: "HTML"})
 	}
 	return err
 }

@@ -70,7 +70,7 @@ func ListSudo(m *telegram.NewMessage) error {
 		userId, userName := GetUserInfo(sudo)
 		formatted += fmt.Sprintf(locales.Tr("sudo.list_entry"), userId, userName)
 	}
-	_, err = msg.Edit(locales.Trf("sudo.list_result", len(sudos), formatted), telegram.SendOptions{ParseMode: "HTML"})
+	_, err = msg.Edit(locales.Trf("sudo.list_result", len(sudos), formatted), &telegram.SendOptions{ParseMode: "HTML"})
 	return err
 }
 

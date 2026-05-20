@@ -17,12 +17,10 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/google/generative-ai-go/genai"
 	"github.com/nfnt/resize"
+	"google.golang.org/genai"
 
 	"slices"
-
-	"google.golang.org/api/option"
 )
 
 func compressImage(imagePath string) ([]byte, error) {
@@ -54,25 +52,28 @@ func ProcessGemini(imagePath, text string) (string, error) {
 	if key == "" {
 		return "", fmt.Errorf("GEMINI_API_KEY is not set")
 	}
-	client, err := genai.NewClient(ctx, option.WithAPIKey(key))
+	client, err := genai.NewClient(ctx, &genai.ClientConfig{
+		APIKey:  key,
+		Backend: genai.BackendGeminiAPI,
+	})
 	if err != nil {
 		return "", err
 	}
-	defer client.Close()
 
-	var req []genai.Part
+	var parts []*genai.Part
 
 	if imagePath != "" {
 		compressedImage, err := compressImage(imagePath)
 		if err != nil {
 			return "", err
 		}
-		req = append(req, genai.ImageData("png", compressedImage))
+		parts = append(parts, genai.NewPartFromBytes(compressedImage, "image/png"))
 	}
-	req = append(req, genai.Text(text))
+	parts = append(parts, genai.NewPartFromText(text))
 
-	model := client.GenerativeModel("gemini-1.5-flash")
-	resp, err := model.GenerateContent(ctx, req...)
+	resp, err := client.Models.GenerateContent(ctx, "gemini-3.1-flash-lite", []*genai.Content{
+		genai.NewContentFromParts(parts, "user"),
+	}, nil)
 	if err != nil {
 		return "", err
 	}
@@ -84,7 +85,7 @@ func ProcessGemini(imagePath, text string) (string, error) {
 		return "", fmt.Errorf("no parts found in response")
 	}
 
-	return fmt.Sprintf("%s", resp.Candidates[0].Content.Parts[0]), nil
+	return fmt.Sprintf("%s", resp.Candidates[0].Content.Parts[0].Text), nil
 }
 
 func RunCommand(cmd string) (string, error) {

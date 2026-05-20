@@ -241,7 +241,7 @@ func JsonHandle(m *telegram.NewMessage) error {
 		defer os.Remove(tmpFile.Name())
 		tmpFile.Write(jsonString)
 		tmpFile.Close()
-		m.ReplyMedia(tmpFile.Name(), telegram.MediaOptions{Caption: "Message JSON"})
+		m.ReplyMedia(tmpFile.Name(), &telegram.MediaOptions{Caption: "Message JSON"})
 		m.Delete()
 	} else {
 		eOR(m, "<pre lang='json'>"+string(jsonString)+"</pre>")
