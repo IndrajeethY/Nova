@@ -133,18 +133,23 @@ func sendUserInfoToTopic(logGroup int64, topicID int32, user *telegram.UserObj) 
 
 	peer, _ := tgbot.GetSendablePeer(logGroup)
 
-	photos, err := tgbot.PhotosGetUserPhotos(
+	photos, err := client.PhotosGetUserPhotos(
 		&telegram.InputUserObj{UserID: user.ID, AccessHash: user.AccessHash},
 		0, 0, 1,
 	)
 	if err == nil {
 		if p, ok := photos.(*telegram.PhotosPhotosObj); ok && len(p.Photos) > 0 {
-			tgbot.SendMessage(peer, info, &telegram.SendOptions{
-				ParseMode: "HTML",
-				Media:     p.Photos[0],
-				TopicID:   topicID,
-			})
-			return
+			if photo, ok := p.Photos[0].(*telegram.PhotoObj); ok {
+				file, dlErr := client.DownloadMedia(photo)
+				if dlErr == nil {
+					tgbot.SendMessage(peer, info, &telegram.SendOptions{
+						ParseMode: "HTML",
+						Media:     file,
+						TopicID:   topicID,
+					})
+					return
+				}
+			}
 		}
 	}
 
@@ -210,7 +215,16 @@ func onBotPrivateMessage(m *telegram.NewMessage) error {
 		sendUserInfoToTopic(logGroup, topicID, user)
 	}
 
-	_, err := m.ForwardTo(logGroup, &telegram.ForwardOptions{TopicID: topicID})
+	peer, err := tgbot.GetSendablePeer(logGroup)
+	if err != nil {
+		return err
+	}
+
+	opts := &telegram.SendOptions{TopicID: topicID}
+	if m.Media() != nil {
+		opts.Media = m.Media()
+	}
+	_, err = tgbot.SendMessage(peer, m.Text(), opts)
 	return err
 }
 
@@ -247,7 +261,7 @@ func onLogGroupReply(m *telegram.NewMessage) error {
 		return nil
 	}
 
-	if m.IsForward() {
+	if m.Sender != nil && m.Sender.ID == tbotId {
 		return nil
 	}
 
@@ -266,15 +280,12 @@ func onLogGroupReply(m *telegram.NewMessage) error {
 		return err
 	}
 
+	opts := &telegram.SendOptions{}
 	if m.Media() != nil {
-		_, err = tgbot.SendMessage(peer, m.Text(), &telegram.SendOptions{
-			Media:     m.Media(),
-			ParseMode: "HTML",
-		})
-	} else if m.Text() != "" {
-		_, err = tgbot.SendMessage(peer, m.Text(), &telegram.SendOptions{
-			ParseMode: "HTML",
-		})
+		opts.Media = m.Media()
+	}
+	if m.Text() != "" || m.Media() != nil {
+		_, err = tgbot.SendMessage(peer, m.Text(), opts)
 	}
 	return err
 }
