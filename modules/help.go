@@ -108,9 +108,9 @@ func HelpCbk(cb *telegram.InlineCallbackQuery) error {
 		if !exists {
 			return fmt.Errorf("module not found in HelpMap")
 		}
-		msg := fmt.Sprintf(locales.Tr("help.commands_header"), module)
+		msg := fmt.Sprintf(locales.Tr("help.commands_header"), module) + "\n\n"
 		for _, h := range handlers {
-			msg += fmt.Sprintf(locales.Tr("help.command_entry"), h.Command, h.Description)
+			msg += fmt.Sprintf(locales.Tr("help.command_entry"), h.Command, h.Description) + "\n"
 		}
 		pageIndex := parts[2]
 		replyMarkup := telegram.NewKeyboard().NewRow(1,
